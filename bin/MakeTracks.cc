@@ -18,12 +18,12 @@
 
 
 // FUNCTION DEFINITIONS HERE
-int MakeTracks (std::string const, std::string const, std::string const);
+int MakeTracks (std::string const, std::string const, std::string const,bool);
 
 
 
 
-int MakeTracks (std::string const DataFileName, std::string const GainCalFileName, std::string const AlignmentFileName)
+int MakeTracks (std::string const DataFileName, std::string const GainCalFileName, std::string const AlignmentFileName, bool IsText)
 {
   std::cout << "DataFileName:      " << DataFileName << std::endl;
   std::cout << "GainCalFileName:   " << GainCalFileName << std::endl;
@@ -34,7 +34,7 @@ int MakeTracks (std::string const DataFileName, std::string const GainCalFileNam
   gStyle->SetOptStat(1111);
 
   // Grab the plt event reader
-  PLTEvent Event(DataFileName, GainCalFileName, AlignmentFileName);
+  PLTEvent Event(DataFileName, GainCalFileName, AlignmentFileName,IsText);
 
   PLTPlane::FiducialRegion FidRegionHits  = PLTPlane::kFiducialRegion_All;
   PLTPlane::FiducialRegion FidRegionTrack = PLTPlane::kFiducialRegion_All;
@@ -237,7 +237,20 @@ int main (int argc, char* argv[])
   std::string const GainCalFileName = argv[2];
   std::string const AlignmentFileName = argv[3];
 
-  MakeTracks(DataFileName, GainCalFileName, AlignmentFileName);
+  if(DataFileName.substr(DataFileName.find_last_of(".")+1) == "dat")
+    {
+      MakeTracks(DataFileName, GainCalFileName, AlignmentFileName,false);
+    }
+  else if(DataFileName.substr(DataFileName.find_last_of(".")+1) == "txt")
+    {
+      MakeTracks(DataFileName, GainCalFileName, AlignmentFileName,true);
+    }
+  else
+    {
+    std::cerr << "Usage: please make sure the provided datafile ends on .dat or .txt" << std::endl;
+    return 1;
+    }
+
 
   return 0;
 }
