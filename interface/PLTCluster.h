@@ -26,7 +26,7 @@ class PLTCluster
     int Channel ();
     int ROC ();
 
-    // Local w.r.t. center of damond
+    // Local w.r.t. center of diamond
     float LX ();
     float LY ();
     std::pair<float, float> LCenter ();

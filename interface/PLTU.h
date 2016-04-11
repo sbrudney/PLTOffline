@@ -24,6 +24,20 @@ namespace PLTU
   int const NCOL     = LASTCOL - FIRSTCOL + 1;
   int const NROW     = LASTROW - FIRSTROW + 1;
 
+  // turn off columns and rows
+/*   int const ACTIVEFIRSTCOL1 = 0; */
+/*   int const ACTIVELASTCOL1 = 51; */
+/*   int const ACTIVEFIRSTROW1 = 40; */
+/*   int const ACTIVELASTROW1 = 60; */
+/*   int const ACTIVEFIRSTCOL2 = 0; */
+/*   int const ACTIVELASTCOL2 = 51; */
+/*   int const ACTIVEFIRSTROW2 = 0; */
+/*   int const ACTIVELASTROW2 = 79; */
+/*   int const ACTIVEFIRSTCOL3 = 20; */
+/*   int const ACTIVELASTCOL3 = 30; */
+/*   int const ACTIVEFIRSTROW3 = 30; */
+/*   int const ACTIVELASTROW3 = 50; */
+
   // Width and height in centimeters
   float const PIXELWIDTH  = 0.0150;
   float const PIXELHEIGHT = 0.0100;

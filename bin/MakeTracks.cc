@@ -119,7 +119,7 @@ int MakeTracks (std::string const DataFileName, std::string const GainCalFileNam
         HistBeamSpot[2]->Fill( Track->fPlaner[2][0], Track->fPlaner[2][1]);
         HistBeamSpot[3]->Fill( Track->fPlaner[2][0], Track->fPlaner[2][1]);
         std::cout<<Track->fPlaner[2][1]<<std::endl;
-        MapSlopeY[Telescope->Channel()]->Fill(Track->fTVY/Track->fTVZ);
+	MapSlopeY[Telescope->Channel()]->Fill(Track->fTVY/Track->fTVZ);
         MapSlopeX[Telescope->Channel()]->Fill(Track->fTVX/Track->fTVZ);
         MapSlope2D[Telescope->Channel()]->Fill(Track->fTVX/Track->fTVZ, Track->fTVY/Track->fTVZ);
         MapResidualY[Telescope->Channel()*10+0]->Fill(Track->LResidualY(0));

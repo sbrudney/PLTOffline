@@ -17,35 +17,36 @@
 #include <time.h>
 
 // Magnet-on fills
-const int nFiles = 8;
+const int nFiles = 1;
 const char *fileNames[nFiles] = {
-  "CombinedRates_4201_clean.txt",
-  // "CombinedRates_4243_clean.txt",
-  // "CombinedRates_4246_clean.txt",
-  "CombinedRates_4266_AllScans_Central.txt",
-  "CombinedRates_4381_clean.txt",
-  "CombinedRates_MuScan_Central.txt",
-  "CombinedRates_4444.txt",
-  "CombinedRates_4467_clean.txt",
-  "CombinedRates_4565_clean.txt",
-  "CombinedRates_4569_clean.txt"
+  "CombinedRates.txt"
+//   "CombinedRates_4201_clean.txt",
+//   // "CombinedRates_4243_clean.txt",
+//   // "CombinedRates_4246_clean.txt",
+//   "CombinedRates_4266_AllScans_Central.txt",
+//   "CombinedRates_4381_clean.txt",
+//   "CombinedRates_MuScan_Central.txt",
+//   "CombinedRates_4444.txt",
+//   "CombinedRates_4467_clean.txt",
+//   "CombinedRates_4565_clean.txt",
+//   "CombinedRates_4569_clean.txt"
 };
 const char *fillLabels[nFiles] = {
-  "Fill 4201 (Aug 13, 26b)",
+  "Fill 4201 (Aug 13, 26b)"//,
   // "Fill 4243 (Aug 21, 303b)",
   // "Fill 4246 (Aug 21-22, #it{50ns}, 254b)",
-  "Fill 4266 (VdM scan, Aug 25, 30b)",
-  "Fill 4381 (Sep 17, 1021b)",
-  "Fill 4435 (mu scan, Sep 28, 881b)",
-  "Fill 4444 (Sep 30, 1453b)",
-  "Fill 4467 (Oct 6-7, 1596b)",
-  "Fill 4565 (Nov 2, 2232b)",
-  "Fill 4569 (Nov 2, 2232b, firmware fix)"
+//   "Fill 4266 (VdM scan, Aug 25, 30b)",
+//   "Fill 4381 (Sep 17, 1021b)",
+//   "Fill 4435 (mu scan, Sep 28, 881b)",
+//   "Fill 4444 (Sep 30, 1453b)",
+//   "Fill 4467 (Oct 6-7, 1596b)",
+//   "Fill 4565 (Nov 2, 2232b)",
+//   "Fill 4569 (Nov 2, 2232b, firmware fix)"
 };
 const bool doAllFit = false;   // show fit to all points
 
 // Use this to exclude a single fit from being drawn.
-const bool doFit[nFiles] = { false, false, true, true, true, true, true, true };
+const bool doFit[nFiles] = { false}//, false, true, true, true, true, true, true };
 
 // Magnet-off fills
 // const int nFiles = 3;

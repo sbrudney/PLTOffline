@@ -14,6 +14,7 @@ class PLTHit
     PLTHit (int, int, int, int, int);
     ~PLTHit ();
 
+
   private:
     int fChannel;
     int fROC;
