@@ -829,7 +829,7 @@ void GetGausHitsOneROC (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int
 }
 
 
-int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofstream& g, float size, float *goodarray, float *badarray)
+int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofstream& g, float size, float smallest, float *goodarray, float *badarray)
 // 2nd function after main()
 {
   // Open the output file
@@ -1015,8 +1015,8 @@ int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofst
 
   // print out good tracks vs bad tracks
   if (save_and_write) {
-    goodarray[int(size*2.0)-8] = float(goodhits[2])/float(goodTracks);
-    badarray[int(size*2.0)-8] = float(badhits[2])/float(badTracks);
+    goodarray[int(size*2.0)-int(smallest)] = float(goodhits[2])/float(goodTracks);
+    badarray[int(size*2.0)-int(smallest)] = float(badhits[2])/float(badTracks);
     
     
   }
@@ -1058,7 +1058,7 @@ int main (int argc, char* argv[])
   bool save_and_write = true;
 
   // types of geometries
-  // 0 = all equal, 1 = cone: 1st largest, 2 = hourglass, 3 = cone: 1st smallest
+  // 0 = all equal, 1 = cone: 1st largest, 2 = hourglass, 3 = cone: 1st smallest, 10 = test
   int shape = 3;
 
   // determine sizes of each ROC, numbers refer to length of square sizes in mm
@@ -1067,6 +1067,7 @@ int main (int argc, char* argv[])
   float size1;
   float size2;
   float size3;
+  float smallest = 4.0;
 
   // files to be created to store values to be plotted in gnuplot
   std::ofstream f,g;
@@ -1097,22 +1098,34 @@ int main (int argc, char* argv[])
 	g.open("table_cone_inverted_badhits.txt");
 	//std::cout<<"f & g opened: CONE INVERTED"<<std::endl;
 	break;
+
+
+	//Test case
+      case(10):
+	f.open("table_test_goodhits.txt");
+	g.open("table_test_badhits.txt");
       }
     }
     
-    for (int si=8; si<=int(sizes)*2; ++si) {
+    for (int si=int(smallest); si<=int(sizes)*2; ++si) {
       
       // must use integers in for loop command, so declare another variable to adjust sizes in half integer intervals
       float s = float(si)/2.0;
       
       // adjustments of ROCs up/down, side-to-side, numbers corresponds to rows or columns
-      float up[3] = {0.0,-1.0,-0.5};//{.0,-1.0*(6.0-s),-0.5*(6.0-s)};//{0.0,0.0,0.0};//
+      float up[3] = {0.0,-1.0,-0.5};//{0.0,0.0,0.0};//
       if (i == 3) {
-	std::cout<<"INVERTED CONE"<<std::endl;
-	up[0] = -2.0;//-.2*(7.0-s);
-	up[1] = -1.0;//-.1*(7.0-s);
+// 	std::cout<<"INVERTED CONE"<<std::endl;
+	up[0] = -0.3;//-.2*(7.0-s);
+	up[1] = 0.0;//-.1*(7.0-s);
 	up[2] = 0.0;
 	//	std::cout<<up[0]<<std::endl<<up[1]<<std::endl<<up[2]<<std::endl;
+      }
+      //test case
+      if (i == 10){
+	up[0] = -0.3;
+	up[1] = 0.0;
+	up[2] = 0.0;
       }
       //else {
       //
@@ -1171,10 +1184,17 @@ int main (int argc, char* argv[])
 	size1 = s - 2.0;
 	size2 = s - 1.0;
 	size3 = s;
+
+	//test case
+      case(10):
+	size1 = s - 2.0;
+	size2 = s;
+	size3 =s;
+	break;
       }
       
       // Adjust active regions according to shape, size, and bumps
-      std::cout<<up[0]<<std::endl<<up[1]<<std::endl<<up[2]<<std::endl;
+      //      std::cout<<up[0]<<std::endl<<up[1]<<std::endl<<up[2]<<std::endl;
       float dcol1 = 52.0 * (float(size1) / 8.0);
       float drow1 = 80.0 * (float(size1) / 8.0);
       ACTIVEFIRSTCOL1 += int(((52.0 - dcol1) / 2.0) + (52.0 * (right[0] / 8.0)));
@@ -1317,7 +1337,7 @@ int main (int argc, char* argv[])
       float goodarray[15];
       float badarray[15];
       
-      PLTMC(ACTIVEREGION,save_and_write, f, g, s, goodarray, badarray);
+      PLTMC(ACTIVEREGION,save_and_write, f, g, s, smallest, goodarray, badarray);
       
       
       if (save_and_write) {
@@ -1326,9 +1346,9 @@ int main (int argc, char* argv[])
 	f<<s<<"   ";
 	g<<s<<"   ";
 	
-	f<<goodarray[si-8]<<""<<std::endl;
+	f<<goodarray[si-int(smallest)]<<""<<std::endl;
 	//std::cout<<badarray[si-8]<<std::endl;
-	g<<badarray[si-8]<<""<<std::endl;
+	g<<badarray[si-int(smallest)]<<""<<std::endl;
 	
 	
       }
