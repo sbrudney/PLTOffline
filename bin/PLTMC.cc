@@ -67,7 +67,7 @@ void CountHitsInActiveRegionBad(int ACTIVEREGION[], int *badtracksarray, int iro
 }
 
 
-void GetPureNoise (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[])
+void GetPureNoise (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[], int *totalhits, int *totalbadhits)
 {
   // Grab list of telescopes
   static std::vector<int> Channels = Alignment.GetListOfChannels();
@@ -76,11 +76,13 @@ void GetPureNoise (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *bad
   for (/*std::vector<int>::iterator*/int ch = 0/*Channels.begin()*/; ch<1 /*!= Channels.end()*/; ++ch) {
 
     int hits[2] = {0,0};
+
     for (int iroc = 0; iroc != 3; ++iroc) {
       Column = gRandom->Integer(PLTU::NCOL) + PLTU::FIRSTCOL;
       Row    = gRandom->Integer(PLTU::NROW) + PLTU::FIRSTROW;
       if (Column >= PLTU::FIRSTCOL && Column <= PLTU::LASTCOL && Row >= PLTU::FIRSTROW && Row <= PLTU::LASTROW) {
         Hits.push_back( new PLTHit(/***/ch, iroc, Column, Row, gRandom->Poisson(150)) );
+	totalhits[iroc] = 1;
       } else {
         std::cout << "out of range" << std::endl;
       }
@@ -90,13 +92,16 @@ void GetPureNoise (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *bad
       CountHitsInActiveRegionBad(ACTIVEREGION,badtracksarray, iroc, hits, Column, Row); 
 
     }
+    if (totalhits[0] == 1 && totalhits[1] == 1 && totalhits[2] == 1) {
+      totalbadhits[0] += 1; 
+    }
   }
 
   return;
 }
 
 
-void GetTracksCollisions (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *goodtracksarray, int ACTIVEREGION[])
+void GetTracksCollisions (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *goodtracksarray, int ACTIVEREGION[], int *totalhits, int *totalgoodhits)
 {
   // Grab list of telescopes
   // Case 0 for PLTMC() function
@@ -110,8 +115,8 @@ void GetTracksCollisions (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, i
     int const ROC     = gRandom->Integer(3);
     //printf("Channel: %2i  ROC: %i\n", Channel, ROC);
 
-    float const lx = 0.45 * (gRandom->Rndm() - 0.5);
-    float const ly = 0.45 * (gRandom->Rndm() - 0.5);
+    float const lx = 0.8 * (gRandom->Rndm() - 0.5);
+    float const ly = 0.8 * (gRandom->Rndm() - 0.5);
     //float const lx = 0.45 * (gRandom->Gaus(0.5,0.5)-0.5);
     //float const ly = 0.45 * (gRandom->Gaus(0.527,5.0)-0.5);
     //printf(" lx ly: %15E  %15E\n", lx, ly);
@@ -127,7 +132,7 @@ void GetTracksCollisions (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, i
     //float const SlopeX = GXYZ[0] / GXYZ[2];
     //float const SlopeY = GXYZ[1] / GXYZ[2];
     float const SlopeX = gRandom->Gaus(0.0,0.005);
-    float const SlopeY = gRandom->Gaus(0.027,0.005);
+    float const SlopeY = gRandom->Gaus(0.027,0.02);
     //if (Channel == 3){
       //printf(" Slope X Y: %15E  %15E\n", SlopeX, SlopeY);}
 
@@ -166,6 +171,7 @@ void GetTracksCollisions (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, i
       //printf("ROC %1i LX PX LY PY   %15E %2i  %15E %2i\n", iroc, LXY.first, PX, LXY.second, PY);
       if (PX >= PLTU::FIRSTCOL && PX <= PLTU::LASTCOL && PY >= PLTU::FIRSTROW && PY <= PLTU::LASTROW) {
         Hits.push_back( new PLTHit(Channel, iroc, PX, PY, adc) );
+	totalhits[iroc] = 1;
       } else {
         //printf("LX PX LY PY   %2i %6.2f %2i   %2i %6.2f %2i\n", LXY.first, PX, rXY.second, PY);
       }
@@ -175,7 +181,9 @@ void GetTracksCollisions (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, i
       CountHitsInActiveRegionGood(ACTIVEREGION,goodtracksarray, iroc, ghits, PX, PY); 
 
     }
-
+    if (totalhits[0] == 1 && totalhits[1] == 1 && totalhits[2] == 1) {
+      totalgoodhits[0] += 1; 
+    }
   }
 
   return;
@@ -183,7 +191,7 @@ void GetTracksCollisions (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, i
 
 
 
-void GetTracksCollisions2 (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[])
+void GetTracksCollisions2 (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[], int *totalhits, int *totalbadhits)
 {
   // Grab list of telescopes
   static std::vector<int> Channels = Alignment.GetListOfChannels();
@@ -256,6 +264,7 @@ void GetTracksCollisions2 (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, 
       //printf("ROC %1i LX PX LY PY   %15E %2i  %15E %2i\n", iroc, LXY.first, PX, LXY.second, PY);
       if (PX >= PLTU::FIRSTCOL && PX <= PLTU::LASTCOL && PY >= PLTU::FIRSTROW && PY <= PLTU::LASTROW) {
         Hits.push_back( new PLTHit(Channel, iroc, PX, PY, adc) );
+	totalhits[iroc] = 1;
       } else {
         //printf("LX PX LY PY   %2i %6.2f %2i   %2i %6.2f %2i\n", LXY.first, PX, rXY.second, PY);
       }
@@ -265,7 +274,9 @@ void GetTracksCollisions2 (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, 
       CountHitsInActiveRegionBad(ACTIVEREGION,badtracksarray, iroc, hits, PX, PY); 
 
     }
-
+    if (totalhits[0] == 1 && totalhits[1] == 1 && totalhits[2] == 1) {
+      totalbadhits[0] += 1; 
+    }
   }
 
   return;
@@ -273,7 +284,7 @@ void GetTracksCollisions2 (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, 
 
 
 
-void GetTracksParallel (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[])
+void GetTracksParallel (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[], int *totalhits, int *totalbadhits)
 {
   // Grab list of telescopes
   static std::vector<int> Channels = Alignment.GetListOfChannels();
@@ -328,6 +339,7 @@ void GetTracksParallel (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int
       //printf("iroc StartCol LX PX StartRow LY PY  %2i  %2i %6.2f %2i   %2i %6.2f %2i\n", iroc, StartCol, LXY.first, PX, StartRow, LXY.second, PY);
       if (PX >= PLTU::FIRSTCOL && PX <= PLTU::LASTCOL && PY >= PLTU::FIRSTROW && PY <= PLTU::LASTROW) {
         Hits.push_back( new PLTHit(Channel, iroc, PX, PY, adc) );
+	totalhits[iroc] = 1;
       } else {
         //printf("StartCol LX PX StartRow LY PY   %2i %6.2f %2i   %2i %6.2f %2i\n", StartCol, LXY.first, PX, StartRow, LXY.second, PY);
       }
@@ -337,12 +349,15 @@ void GetTracksParallel (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int
       CountHitsInActiveRegionBad(ACTIVEREGION,badtracksarray, iroc, hits, PX, PY); 
 
     }
+    if (totalhits[0] == 1 && totalhits[1] == 1 && totalhits[2] == 1) {
+      totalbadhits[0] += 1; 
+    }
 
   }
 
   return;
 }
-void GetTracksRandomSlope (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[])
+void GetTracksRandomSlope (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[], int *totalhits, int *totalbadhits)
 {
   // This function to generate events hitting telescopes head on
 
@@ -388,6 +403,7 @@ void GetTracksRandomSlope (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, 
         // Add it as a hit if it's in the range of the diamond
         if (PX >= PLTU::FIRSTCOL && PX <= PLTU::LASTCOL && PY >= PLTU::FIRSTROW && PY <= PLTU::LASTROW) {
           Hits.push_back( new PLTHit(i, r, PX, PY, adc) );
+	  totalhits[r] = 1;
         } else {
           //printf("StartCol LX PX StartRow LY PY   %2i %6.2f %2i   %2i %6.2f %2i\n", StartCol, LX, PX, StartRow, LY, PY);
         }
@@ -397,11 +413,14 @@ void GetTracksRandomSlope (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, 
 	CountHitsInActiveRegionBad(ACTIVEREGION,badtracksarray, r, hits, PX, PY); 
 
       }
+      if (totalhits[0] == 1 && totalhits[1] == 1 && totalhits[2] == 1) {
+	totalbadhits[0] += 1; 
+      }
     }
   }
   return;
 }
-void GetTracksHeadOnFirstROCMultiTracks (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[])
+void GetTracksHeadOnFirstROCMultiTracks (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[], int *totalhits, int *totalbadhits)
 {
   // This function to generate events hitting telescopes head on
 
@@ -447,6 +466,7 @@ void GetTracksHeadOnFirstROCMultiTracks (std::vector<PLTHit*>& Hits, PLTAlignmen
         // Add it as a hit if it's in the range of the diamond
         if (PX >= PLTU::FIRSTCOL && PX <= PLTU::LASTCOL && PY >= PLTU::FIRSTROW && PY <= PLTU::LASTROW) {
           Hits.push_back( new PLTHit(i, r, PX, PY, adc) );
+	  totalhits[r] = 1;
         } else {
           //printf("StartCol LX PX StartRow LY PY   %2i %6.2f %2i   %2i %6.2f %2i\n", StartCol, LX, PX, StartRow, LY, PY);
         }
@@ -456,13 +476,16 @@ void GetTracksHeadOnFirstROCMultiTracks (std::vector<PLTHit*>& Hits, PLTAlignmen
 	CountHitsInActiveRegionBad(ACTIVEREGION,badtracksarray, r, hits, PX, PY); 
       
       }
+      if (totalhits[0] == 1 && totalhits[1] == 1 && totalhits[2] == 1) {
+	totalbadhits[0] += 1; 
+      }
     }
   }
   return;
 }
 
 
-void GetRandTracksROCEfficiencies (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, float const Eff0, float const Eff1, float const Eff2, int *badtracksarray, int ACTIVEREGION[])
+void GetRandTracksROCEfficiencies (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, float const Eff0, float const Eff1, float const Eff2, int *badtracksarray, int ACTIVEREGION[], int *totalhits, int *totalbadhits)
 {
   // This function to generate events hitting telescopes head on
 
@@ -509,6 +532,7 @@ void GetRandTracksROCEfficiencies (std::vector<PLTHit*>& Hits, PLTAlignment& Ali
         //printf("Ch ROC PX PY %2i %1i %3i %3i\n", i, r, PX, PY);
         if (gRandom->Rndm() < Eff[r]) {
           Hits.push_back( new PLTHit(i, r, PX, PY, adc) );
+	  totalhits[r] = 1;
         }
       } else {
         //printf("StartCol LX PX StartRow LY PY   %2i %6.2f %2i   %2i %6.2f %2i\n", StartCol, LX, PX, StartRow, LY, PY);
@@ -519,12 +543,15 @@ void GetRandTracksROCEfficiencies (std::vector<PLTHit*>& Hits, PLTAlignment& Ali
       CountHitsInActiveRegionBad(ACTIVEREGION,badtracksarray, r, hits, PX, PY); 
       
     }
+    if (totalhits[0] == 1 && totalhits[1] == 1 && totalhits[2] == 1) {
+      totalbadhits[0] += 1; 
+    }
   }
   return;
 }
 
 
- void GetTracksROCEfficiencies (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, float const Eff0, float const Eff1, float const Eff2, int *badtracksarray, int ACTIVEREGION[])
+void GetTracksROCEfficiencies (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, float const Eff0, float const Eff1, float const Eff2, int *badtracksarray, int ACTIVEREGION[], int *totalhits, int *totalbadhits)
 {
   // This function to generate events hitting telescopes head on
 
@@ -565,6 +592,7 @@ void GetRandTracksROCEfficiencies (std::vector<PLTHit*>& Hits, PLTAlignment& Ali
       if (PX >= PLTU::FIRSTCOL && PX <= PLTU::LASTCOL && PY >= PLTU::FIRSTROW && PY <= PLTU::LASTROW) {
         if (gRandom->Rndm() < Eff[r]) {
           Hits.push_back( new PLTHit(i, r, PX, PY, adc) );
+	  totalhits[r] = 1;
         }
       } else {
         //printf("StartCol LX PX StartRow LY PY   %2i %6.2f %2i   %2i %6.2f %2i\n", StartCol, LX, PX, StartRow, LY, PY);
@@ -575,12 +603,15 @@ void GetRandTracksROCEfficiencies (std::vector<PLTHit*>& Hits, PLTAlignment& Ali
       CountHitsInActiveRegionBad(ACTIVEREGION,badtracksarray, r, hits, PX, PY); 
       
     }
+    if (totalhits[0] == 1 && totalhits[1] == 1 && totalhits[2] == 1) {
+      totalbadhits[0] += 1; 
+    }
   }
   return;
 }
 
 
-void GetSpecificClusters (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[])
+void GetSpecificClusters (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[], int *totalhits, int *totalbadhits)
 {
   // This function to generate events hitting telescopes head on
 
@@ -618,18 +649,22 @@ void GetSpecificClusters (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, i
       // Add it
       Hits.push_back( new PLTHit(i, r, PX, PY, adc) );
       Hits.push_back( new PLTHit(i, r, PX+1, PY, adc) );
+      totalhits[r] = 1;
 
       // Add to hits if in range of active pixels
       // loop for each ROC
       CountHitsInActiveRegionBad(ACTIVEREGION,badtracksarray, r, hits, PX, PY); 
       
     }
+    if (totalhits[0] == 1 && totalhits[1] == 1 && totalhits[2] == 1) {
+      totalbadhits[0] += 1; 
+    }
   }
   return;
 }
 
 
-void GetTracksParallelGaus (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[])
+void GetTracksParallelGaus (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[], int *totalhits, int *totalbadhits)
 {
   // This function to generate events hitting telescopes head on
 
@@ -671,6 +706,7 @@ void GetTracksParallelGaus (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment,
       // Add it as a hit if it's in the range of the diamond
       if (PX >= PLTU::FIRSTCOL && PX <= PLTU::LASTCOL && PY >= PLTU::FIRSTROW && PY <= PLTU::LASTROW) {
         Hits.push_back( new PLTHit(i, r, PX, PY, adc) );
+	totalhits[r] = 1;
       } else {
         //printf("StartCol LX PX StartRow LY PY   %2i %6.2f %2i   %2i %6.2f %2i\n", StartCol, LX, PX, StartRow, LY, PY);
       }
@@ -680,12 +716,15 @@ void GetTracksParallelGaus (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment,
       CountHitsInActiveRegionBad(ACTIVEREGION,badtracksarray, r, hits, PX, PY); 
       
     }
+    if (totalhits[0] == 1 && totalhits[1] == 1 && totalhits[2] == 1) {
+      totalbadhits[0] += 1; 
+    }
   }
   return;
 }
 
 
-void GetTracksHeadOn (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray,int  ACTIVEREGION[])
+void GetTracksHeadOn (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray,int  ACTIVEREGION[], int *totalhits, int *totalbadhits)
 {
   // This function to generate events hitting telescopes head on
 
@@ -726,6 +765,7 @@ void GetTracksHeadOn (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *
       // Add it as a hit if it's in the range of the diamond
       if (PX >= PLTU::FIRSTCOL && PX <= PLTU::LASTCOL && PY >= PLTU::FIRSTROW && PY <= PLTU::LASTROW) {
         Hits.push_back( new PLTHit(i, r, PX, PY, adc) );
+	totalhits[r] = 1;
       } else {
         //printf("StartCol LX PX StartRow LY PY   %2i %6.2f %2i   %2i %6.2f %2i\n", StartCol, LX, PX, StartRow, LY, PY);
       }
@@ -735,12 +775,15 @@ void GetTracksHeadOn (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *
       CountHitsInActiveRegionBad(ACTIVEREGION,badtracksarray, r, hits, PX, PY); 
       
     }
+    if (totalhits[0] == 1 && totalhits[1] == 1 && totalhits[2] == 1) {
+      totalbadhits[0] += 1; 
+    }
   }
   return;
 }
 
 
-void GetTracksHeadOnFirstROC (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[])
+void GetTracksHeadOnFirstROC (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[], int *totalhits, int *totalbadhits)
 {
   // This function to generate events hitting telescopes head on
 
@@ -777,6 +820,7 @@ void GetTracksHeadOnFirstROC (std::vector<PLTHit*>& Hits, PLTAlignment& Alignmen
       // Add it as a hit if it's in the range of the diamond
       if (PX >= PLTU::FIRSTCOL && PX <= PLTU::LASTCOL && PY >= PLTU::FIRSTROW && PY <= PLTU::LASTROW) {
         Hits.push_back( new PLTHit(i, r, PX, PY, adc) );
+	totalhits[r] = 1;
       } else {
         //printf("StartCol LX PX StartRow LY PY   %2i %6.2f %2i   %2i %6.2f %2i\n", StartCol, LX, PX, StartRow, LY, PY);
       }
@@ -786,12 +830,15 @@ void GetTracksHeadOnFirstROC (std::vector<PLTHit*>& Hits, PLTAlignment& Alignmen
       CountHitsInActiveRegionBad(ACTIVEREGION,badtracksarray, r, hits, PX, PY); 
       
     }
+    if (totalhits[0] == 1 && totalhits[1] == 1 && totalhits[2] == 1) {
+      totalbadhits[0] += 1; 
+    }
   }
   return;
 }
 
 
-void GetGausHitsOneROC (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[])
+void GetGausHitsOneROC (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int *badtracksarray, int ACTIVEREGION[], int *totalhits, int *totalbadhits)
 {
   // This function to generate events hitting telescopes head on
 
@@ -822,14 +869,14 @@ void GetGausHitsOneROC (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int
 
   // can't use usual method since only does the first ROC
   if (PX >= ACTIVEREGION[0] && PX <= ACTIVEREGION[1] && PY >= ACTIVEREGION[2] && PY <= ACTIVEREGION[3]) {
-    badtracksarray[0] += 1;
+    // badtracksarray[0] += 1;
   }
       
   return;
 }
 
 
-int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofstream& g, float size, float smallest, float *goodarray, float *badarray)
+int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofstream& g, float size, float smallest, float *goodarray, float *badarray, int *goodhitsplotted, int *badhitsplotted, int *goodtracksplotted, int *badtracksplotted)
 // 2nd function after main()
 {
   // Open the output file
@@ -850,13 +897,15 @@ int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofst
   //Alignment.ReadAlignmentFile("straight");
   //Alignment.ReadAlignmentFile("ALIGNMENT/Alignment_1Telescope.dat");
   //Alignment.ReadAlignmentFile("ALIGNMENT/Alignment_PLTMC.dat");
-  Alignment.ReadAlignmentFile("ALIGNMENT/Alignment_PLTMC.dat");
+  //Alignment.ReadAlignmentFile("ALIGNMENT/Alignment_PLTMC.dat");
+  Alignment.ReadAlignmentFile("ALIGNMENT/Alignment_IdealInstall.dat");
 
   // Vector of hits for each event
   std::vector<PLTHit*> Hits;
   //// ?Gets vectors from file chosen above? and calls them "Hits"
   //// default set at 10000
   int const NEvents = 100000;
+  //int const NEvents = 10;
 
   //// keep track of tracks from interaction point vs. others
   int goodTracks = 0;
@@ -865,6 +914,9 @@ int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofst
   // 1st is 1 hit, 2nd is 2, 3rd is 3
   int goodhits[3] = {0, 0, 0};
   int badhits[3] = {0, 0, 0,};
+
+  int totalgoodhits[1] = {0};
+  int totalbadhits[1] = {0};
 
   // define active areas
 //   int const ACTIVEFIRSTCOL1 = 49;
@@ -893,6 +945,10 @@ int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofst
     if (random_number <= 88){choice = 0;}
     else {choice = 1+ rand() % 12;}
 
+    int totalhits[3];
+    totalhits[0] = 0;
+    totalhits[1] = 0;
+    totalhits[2] = 0;
 
     switch(choice) {
       //// default: switch was at 0 for only good tracks
@@ -900,54 +956,55 @@ int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofst
       //// case 0 are "good tracks" from collision point
       case 0:
         goodTracks += 1;
-        GetTracksCollisions(Hits, Alignment, goodhits, ACTIVEREGION);
+        GetTracksCollisions(Hits, Alignment, goodhits, ACTIVEREGION, totalhits, totalgoodhits);
         break;
       case 1:
 	badTracks += 1;
-        GetTracksHeadOnFirstROC(Hits, Alignment, badhits, ACTIVEREGION);
+        GetTracksHeadOnFirstROC(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
       case 2:
 	badTracks += 1;
-        GetTracksHeadOn(Hits, Alignment, badhits, ACTIVEREGION);
+        GetTracksHeadOn(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
       case 3:
 	badTracks += 1;
-        GetTracksParallelGaus(Hits, Alignment, badhits, ACTIVEREGION);
+        GetTracksParallelGaus(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
       case 4:
 	badTracks += 1;
-        GetSpecificClusters(Hits, Alignment, badhits, ACTIVEREGION);
+        GetSpecificClusters(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
       case 5:
 	badTracks += 1;
-        GetTracksROCEfficiencies(Hits, Alignment, 0.20, 0.80, 0.90, badhits, ACTIVEREGION);
+        GetTracksROCEfficiencies(Hits, Alignment, 0.20, 0.80, 0.90, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
       case 6:
 	badTracks += 1;
-        GetRandTracksROCEfficiencies(Hits, Alignment, 0.20, 0.80, 0.90, badhits, ACTIVEREGION);
+        GetRandTracksROCEfficiencies(Hits, Alignment, 0.20, 0.80, 0.90, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
       case 7:
 	badTracks += 1;
-        GetTracksHeadOnFirstROCMultiTracks(Hits, Alignment, badhits, ACTIVEREGION);
+        GetTracksHeadOnFirstROCMultiTracks(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
       case 8:
 	badTracks += 1;
-        GetTracksRandomSlope(Hits, Alignment, badhits, ACTIVEREGION);
+        GetTracksRandomSlope(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
       case 9:
 	badTracks += 1;
-        GetTracksParallel(Hits, Alignment, badhits, ACTIVEREGION);
+        GetTracksParallel(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
       case 10:
 	badTracks += 1;
-        GetPureNoise(Hits, Alignment, badhits, ACTIVEREGION);
+        GetPureNoise(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
       case 11:
 	badTracks += 1;
-        GetTracksCollisions2(Hits, Alignment, badhits, ACTIVEREGION);
+        GetTracksCollisions2(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
+	break;
       case 12:
 	badTracks += 1;
-        GetGausHitsOneROC(Hits, Alignment, badhits, ACTIVEREGION);
+        GetGausHitsOneROC(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
 	break;
     }
     //badTracks = NEvents - goodTracks;
@@ -1012,34 +1069,40 @@ int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofst
 
     Hits.clear();
   }
-
-  // print out good tracks vs bad tracks
+  //std::cout<<totalbadhits<<std::endl;
+  // print out good tracks vs bad tracks and others
   if (save_and_write) {
-    goodarray[int(size*2.0)-int(smallest)] = float(goodhits[2])/float(goodTracks);
-    badarray[int(size*2.0)-int(smallest)] = float(badhits[2])/float(badTracks);
+    goodarray[int(size*2.0)-int(smallest)] = float(goodhits[2])/float(totalgoodhits[0]);//goodTracks);//goodhits[2];//int(goodTracks);//float(goodhits[2])/float(goodTracks);
+    badarray[int(size*2.0)-int(smallest)] = float(badhits[2])/float(totalbadhits[0]);//badhits[2];//int(badTracks);//float(badhits[2])/float(badTracks);
+    //std::cout<<float(badhits[2])/float(totalbadhits[0])<<std::endl;
+    goodhitsplotted[int(size*2.0)-int(smallest)] = goodhits[2];
+    badhitsplotted[int(size*2.0)-int(smallest)] = badhits[2];
+    goodtracksplotted[int(size*2.0)-int(smallest)] = goodTracks;
+    badtracksplotted[int(size*2.0)-int(smallest)] = badTracks;
     
     
   }
   
   // just prints to screen good vs. bad tracks
-  else {
-    std::cout<<"Good Tracks:  "<<goodTracks<<std::endl;  
-    std::cout<<"Good Tracks Hits:  "<<std::endl;
-    std::cout<<"3 Hits:       "<<goodhits[2]<<std::endl;
-    std::cout<<"2 Hits:       "<<goodhits[1]<<std::endl;
-    std::cout<<"1 Hit:        "<<goodhits[0]<<std::endl;  
-    std::cout<<"Bad Tracks:   "<< badTracks<<std::endl;
-    std::cout<<"Bad Tracks Hits:   "<<std::endl;
+  //  else {
+  //std::cout<<"Good Tracks:  "<<totalgoodhits[0]<<std::endl;  
+    //std::cout<<"Good Tracks Hits:  "<<std::endl;
+    //std::cout<<"3 Hits:       "<<goodhits[2]<<std::endl;
+    //    std::cout<<"2 Hits:       "<<goodhits[1]<<std::endl;
+    //    std::cout<<"1 Hit:        "<<goodhits[0]<<std::endl;  
+    std::cout<<"Bad Tracks:   "<< totalbadhits[0]<<std::endl;
+    //std::cout<<"Bad Tracks Hits:   "<<std::endl;
     std::cout<<"3 Hits:       "<<badhits[2]<<std::endl;
-    std::cout<<"2 Hits:       "<<badhits[1]<<std::endl;
-    std::cout<<"1 Hit:        "<<badhits[0]<<std::endl;
-    std::cout<<"Percent Good: "<<100.0 * float(goodTracks)/float(NEvents)<<"%"<<std::endl;
-    std::cout<<"Ratio 3 Hit Bad/Total Bad:   "<<float(badhits[2])/float(badTracks)<<std::endl;
-    std::cout<<"Ratio 3 Hit Good/Total Good: "<<float(goodhits[2])/float(goodTracks)<<std::endl;
-    //     for (int j=0; j<12; ++j){
-    //       std::cout<<ACTIVEREGION[j]<<std::endl;
-    //     }
-  }
+    //    std::cout<<"2 Hits:       "<<badhits[1]<<std::endl;
+    //    std::cout<<"1 Hit:        "<<badhits[0]<<std::endl;
+    //std::cout<<"Percent Good: "<<100.0 * float(goodTracks)/float(NEvents)<<"%"<<std::endl;
+    std::cout<<"Ratio 3 Hit Bad/Total Bad:   "<<float(badhits[2])/float(totalbadhits[0])<<std::endl;
+     if (float(badhits[2])/float(totalbadhits[0]) > 1.0){
+    std::cout<<"Ratio 3 Hit Good/Total Good: "<<float(goodhits[2])/float(totalgoodhits[0])<<std::endl;
+        for (int j=0; j<12; ++j){
+          std::cout<<ACTIVEREGION[j]<<std::endl;
+	}}
+     //   }
   fout.close();
 
   return 0;
@@ -1062,15 +1125,14 @@ int main (int argc, char* argv[])
   int shape = 3;
 
   // determine sizes of each ROC, numbers refer to length of square sizes in mm
-  // 4 = small, 5 = medium, 6 = large
-  float sizes = 6.0;
+  float sizes = 8.0;
   float size1;
   float size2;
   float size3;
-  float smallest = 4.0;
+  float smallest = 0.0;
 
   // files to be created to store values to be plotted in gnuplot
-  std::ofstream f,g;
+  std::ofstream f,g,h,k;
 
   // loop through all geometries
   for (int i=0; i<=shape; ++i){
@@ -1081,21 +1143,29 @@ int main (int argc, char* argv[])
       case(0):
 	f.open("table_equal_goodhits.txt");
 	g.open("table_equal_badhits.txt");
+	h.open("track_tables/equal_goodhits.txt");
+	k.open("track_tables/equal_badhits.txt");
 	//std::cout<<"f & g opened: EQUAL"<<std::endl;
 	break;
       case(1):
 	f.open("table_cone_goodhits.txt");
 	g.open("table_cone_badhits.txt");
+	h.open("track_tables/cone_goodhits.txt");
+	k.open("track_tables/cone_badhits.txt");
 	//std::cout<<"f & g opened: CONE"<<std::endl;
 	break;
       case(2):
 	f.open("table_hourglass_goodhits.txt");
 	g.open("table_hourglass_badhits.txt");
+	h.open("track_tables/hourglass_goodhits.txt");
+	k.open("track_tables/hourglass_badhits.txt");
 	//std::cout<<"f & g opened: HOURGLASS"<<std::endl;
 	break;
       case(3):
 	f.open("table_cone_inverted_goodhits.txt");
 	g.open("table_cone_inverted_badhits.txt");
+	h.open("track_tables/cone_inverted_goodhits.txt");
+	k.open("track_tables/cone_inverted_badhits.txt");
 	//std::cout<<"f & g opened: CONE INVERTED"<<std::endl;
 	break;
 
@@ -1104,6 +1174,8 @@ int main (int argc, char* argv[])
       case(10):
 	f.open("table_test_goodhits.txt");
 	g.open("table_test_badhits.txt");
+	h.open("track_tables/test_goodhits.txt");
+	k.open("track_tables/test_badhits.txt");
       }
     }
     
@@ -1113,10 +1185,10 @@ int main (int argc, char* argv[])
       float s = float(si)/2.0;
       
       // adjustments of ROCs up/down, side-to-side, numbers corresponds to rows or columns
-      float up[3] = {0.0,-1.0,-0.5};//{0.0,0.0,0.0};//
+      float up[3] = {0.0,0.0,0.0};//{0.0,-1.0,-0.5};//
       if (i == 3) {
 // 	std::cout<<"INVERTED CONE"<<std::endl;
-	up[0] = -0.3;//-.2*(7.0-s);
+	up[0] = 0.0;//-0.3;//-.2*(7.0-s);
 	up[1] = 0.0;//-.1*(7.0-s);
 	up[2] = 0.0;
 	//	std::cout<<up[0]<<std::endl<<up[1]<<std::endl<<up[2]<<std::endl;
@@ -1181,8 +1253,8 @@ int main (int argc, char* argv[])
 	size3 = s;
 	break;
       case(3):
-	size1 = s - 2.0;
-	size2 = s - 1.0;
+	size1 = s - 1.0;
+	size2 = s - 0.5;
 	size3 = s;
 
 	//test case
@@ -1195,26 +1267,38 @@ int main (int argc, char* argv[])
       
       // Adjust active regions according to shape, size, and bumps
       //      std::cout<<up[0]<<std::endl<<up[1]<<std::endl<<up[2]<<std::endl;
-      float dcol1 = 52.0 * (float(size1) / 8.0);
-      float drow1 = 80.0 * (float(size1) / 8.0);
-      ACTIVEFIRSTCOL1 += int(((52.0 - dcol1) / 2.0) + (52.0 * (right[0] / 8.0)));
+      float dcol1 = 51.0 * (float(size1) / 8.0);
+      float drow1 = 79.0 * (float(size1) / 8.0);
+      ACTIVEFIRSTCOL1 += int(((51.0 - dcol1) / 2.0) + (51.0 * (right[0] / 8.0)));
+      if (ACTIVEFIRSTCOL1 < 0) {ACTIVEFIRSTCOL1 = 0;}
       ACTIVELASTCOL1 -= ACTIVEFIRSTCOL1 - int((51.0 * (right[0] / 8.0)));
-      ACTIVEFIRSTROW1 += int(((80.0 - drow1) / 2.0) + (79.0 * (up[0] / 8.0)));
+      if (ACTIVELASTCOL1 > 51) {ACTIVELASTCOL1 = 51;}
+      ACTIVEFIRSTROW1 += int(((79.0 - drow1) / 2.0) + (79.0 * (up[0] / 8.0)));
+      if (ACTIVEFIRSTROW1 < 0) {ACTIVEFIRSTROW1 = 0;}
       ACTIVELASTROW1 -= ACTIVEFIRSTROW1 - int(79.0 * (up[0] / 8.0));
+      if (ACTIVELASTROW1 > 79) {ACTIVELASTROW1 = 79;}
       
-      float dcol2 = 52.0 * (float(size2) / 8.0);
-      float drow2 = 80.0 * (float(size2) / 8.0);
-      ACTIVEFIRSTCOL2 += int(((52.0 - dcol2) / 2.0) + (52.0 * (right[1] / 8.0)));
+      float dcol2 = 51.0 * (float(size2) / 8.0);
+      float drow2 = 79.0 * (float(size2) / 8.0);
+      ACTIVEFIRSTCOL2 += int(((51.0 - dcol2) / 2.0) + (51.0 * (right[1] / 8.0)));
+      if (ACTIVEFIRSTCOL2 < 0) {ACTIVEFIRSTCOL2 = 0;}
       ACTIVELASTCOL2 -= ACTIVEFIRSTCOL2 - int((51.0 * (right[1] / 8.0)));
-      ACTIVEFIRSTROW2 += int(((80.0 - drow2) / 2.0) + (79.0 * (up[1] / 8.0)));
+      if (ACTIVELASTCOL2 > 51) {ACTIVELASTCOL2 = 51;}
+      ACTIVEFIRSTROW2 += int(((79.0 - drow2) / 2.0) + (79.0 * (up[1] / 8.0)));
+      if (ACTIVEFIRSTROW2 < 0) {ACTIVEFIRSTROW2 = 0;}
       ACTIVELASTROW2 -= ACTIVEFIRSTROW2 - int(79.0 * (up[1] / 8.0));
+      if (ACTIVELASTROW2 > 79) {ACTIVELASTROW2 = 79;}
       
-      float dcol3 = 52.0 * (float(size3) / 8.0);
-      float drow3 = 80.0 * (float(size3) / 8.0);
-      ACTIVEFIRSTCOL3 += int(((52.0 - dcol3) / 2.0) + (52.0 * (right[2] / 8.0)));
+      float dcol3 = 51.0 * (float(size3) / 8.0);
+      float drow3 = 79.0 * (float(size3) / 8.0);
+      ACTIVEFIRSTCOL3 += int(((51.0 - dcol3) / 2.0) + (51.0 * (right[2] / 8.0)));
+      if (ACTIVEFIRSTCOL3 < 0) {ACTIVEFIRSTCOL3 = 0;}
       ACTIVELASTCOL3 -= ACTIVEFIRSTCOL3 - int((51.0 * (right[2] / 8.0)));
-      ACTIVEFIRSTROW3 += int(((80.0 - drow3) / 2.0) + (79.0 * (up[2] / 8.0)));
+      if (ACTIVELASTCOL3 > 51) {ACTIVELASTCOL3 = 51;}
+      ACTIVEFIRSTROW3 += int(((79.0 - drow3) / 2.0) + (79.0 * (up[2] / 8.0)));
+      if (ACTIVEFIRSTROW3 < 0) {ACTIVEFIRSTROW3 = 0;}
       ACTIVELASTROW3 -= ACTIVEFIRSTROW3 - int(79.0 * (up[2] / 8.0));
+      if (ACTIVELASTROW3 > 79) {ACTIVELASTROW3 = 79;}
       
       //   for (int i = 1; i<=divide; ++i) {
       //     //sets active regions for the ROCs
@@ -1334,10 +1418,14 @@ int main (int argc, char* argv[])
 	  ACTIVELASTROW3
 	};
 
-      float goodarray[15];
-      float badarray[15];
+      float goodarray[30];
+      float badarray[30];
+      int goodhitsplotted[30];
+      int badhitsplotted[30];
+      int goodtracksplotted[30];
+      int badtracksplotted[30];
       
-      PLTMC(ACTIVEREGION,save_and_write, f, g, s, smallest, goodarray, badarray);
+      PLTMC(ACTIVEREGION,save_and_write, f, g, s, smallest, goodarray, badarray, goodhitsplotted, badhitsplotted, goodtracksplotted, badtracksplotted);
       
       
       if (save_and_write) {
@@ -1345,16 +1433,21 @@ int main (int argc, char* argv[])
 	//for (int i = 4; i<=s; ++i){
 	f<<s<<"   ";
 	g<<s<<"   ";
+	h<<s<<"   ";
+	k<<s<<"   ";
 	
 	f<<goodarray[si-int(smallest)]<<""<<std::endl;
 	//std::cout<<badarray[si-8]<<std::endl;
 	g<<badarray[si-int(smallest)]<<""<<std::endl;
-	
+	h<<goodhitsplotted[si-int(smallest)]<<""<<std::endl;
+	k<<badhitsplotted[si-int(smallest)]<<""<<std::endl;	
 	
       }
     }
     f.close();
     g.close();
+    h.close();
+    k.close();
   }
   return 0;
 }
