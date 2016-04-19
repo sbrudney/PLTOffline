@@ -622,6 +622,11 @@ void GetSpecificClusters (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, i
     int const StartCol = gRandom->Integer(10) + PLTU::FIRSTCOL + 5;
     int const StartRow = gRandom->Integer(10) + PLTU::FIRSTROW + 5;
 
+    //int const StartCol = gRandom->Integer(52);
+    //int const StartRow = gRandom->Integer(80);
+    //int const StartCol = gRandom->Integer(PLTU::NCOL + 20) + PLTU::FIRSTCOL - 10;
+    //int const StartRow = gRandom->Integer(PLTU::NROW + 20) + PLTU::FIRSTROW - 10;
+
     int hits[2] = {0,0};
 
     for (int r = 0; r != 3; ++r) {
@@ -680,6 +685,8 @@ void GetTracksParallelGaus (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment,
     // pick a starting point with width and offset
     int const StartCol = gRandom->Gaus( (PLTU::FIRSTCOL + PLTU::LASTCOL + 1.0) / 2.0 + ColOffset, ColWidth);
     int const StartRow = gRandom->Gaus( (PLTU::FIRSTROW + PLTU::LASTROW + 1.0) / 2.0 + RowOffset, RowWidth);
+    //int const StartCol = gRandom->Integer(PLTU::NCOL + 20) + PLTU::FIRSTCOL - 10;
+    //int const StartRow = gRandom->Integer(PLTU::NROW + 20) + PLTU::FIRSTROW - 10;
 
     int hits[2] = {0,0};
 
@@ -734,6 +741,10 @@ void GetTracksHeadOn (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int (
     // pick a starting point.  +/- 10 should cover shifts in alignment
     int const StartCol = gRandom->Integer(PLTU::NCOL + 20) + PLTU::FIRSTCOL - 10;
     int const StartRow = gRandom->Integer(PLTU::NROW + 20) + PLTU::FIRSTROW - 10;
+
+    //int const StartCol = gRandom->Integer(52);
+    //int const StartRow = gRandom->Integer(80);
+
 
     int hits[2] = {0,0};
 
@@ -962,14 +973,17 @@ int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofst
         GetTracksHeadOnFirstROC(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
       case 2:
+	// needs fixing - most problamatic  
 	badTracks += 1;
         GetTracksHeadOn(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
       case 3:
+	// needs fixing -> fixed??
 	badTracks += 1;
         GetTracksParallelGaus(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
       case 4:
+	// needs fixing -> fixed??
 	badTracks += 1;
         GetSpecificClusters(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
@@ -1089,18 +1103,20 @@ int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofst
     //std::cout<<"3 Hits:       "<<goodhits[2]<<std::endl;
     //    std::cout<<"2 Hits:       "<<goodhits[1]<<std::endl;
     //    std::cout<<"1 Hit:        "<<goodhits[0]<<std::endl;  
-    std::cout<<"Bad Tracks:   "<< totalbadhits<<std::endl;
+    //std::cout<<"Bad Tracks:   "<< totalbadhits<<std::endl;
     //std::cout<<"Bad Tracks Hits:   "<<std::endl;
-    std::cout<<"3 Hits:       "<<badhits[2]<<std::endl;
+    //std::cout<<"3 Hits:       "<<badhits[2]<<std::endl;
     //    std::cout<<"2 Hits:       "<<badhits[1]<<std::endl;
     //    std::cout<<"1 Hit:        "<<badhits[0]<<std::endl;
     //std::cout<<"Percent Good: "<<100.0 * float(goodTracks)/float(NEvents)<<"%"<<std::endl;
-    std::cout<<"Ratio 3 Hit Bad/Total Bad:   "<<float(badhits[2])/float(totalbadhits)<<std::endl;
-     if (float(badhits[2])/float(totalbadhits) > 1.0){
-    std::cout<<"Ratio 3 Hit Good/Total Good: "<<float(goodhits[2])/float(totalgoodhits)<<std::endl;
-        for (int j=0; j<12; ++j){
-          std::cout<<ACTIVEREGION[j]<<std::endl;
-	}}
+    //std::cout<<"Ratio 3 Hit Bad/Total Bad:   "<<float(badhits[2])/float(totalbadhits)<<std::endl;
+    // if (float(badhits[2])/float(totalbadhits) > 1.0){
+    //std::cout<<"Ratio 3 Hit Good/Total Good: "<<float(goodhits[2])/float(totalgoodhits)<<std::endl;
+  //  for (int j=0; j<12; ++j){
+  //      std::cout<<ACTIVEREGION[j]<<std::endl;
+  //  }
+  //}
+
      //   }
   fout.close();
 
@@ -1121,14 +1137,14 @@ int main (int argc, char* argv[])
 
   // types of geometries
   // 0 = all equal, 1 = cone: 1st largest, 2 = hourglass, 3 = cone: 1st smallest, 10 = test
-  int shape = 3;
+  int shape = 0;
 
   // determine sizes of each ROC, numbers refer to length of square sizes in mm
   float sizes = 8.0;
   float size1;
   float size2;
   float size3;
-  float smallest = 0.0;
+  float smallest = 7.0;
 
   // files to be created to store values to be plotted in gnuplot
   std::ofstream f,g,h,k;
@@ -1139,28 +1155,28 @@ int main (int argc, char* argv[])
     // determine which files to use based on geometries
     if (save_and_write) {
       switch(i) {
-      case(0):
+      case 0:
 	f.open("table_equal_goodhits.txt");
 	g.open("table_equal_badhits.txt");
 	h.open("track_tables/equal_goodhits.txt");
 	k.open("track_tables/equal_badhits.txt");
 	//std::cout<<"f & g opened: EQUAL"<<std::endl;
 	break;
-      case(1):
+      case 1:
 	f.open("table_cone_goodhits.txt");
 	g.open("table_cone_badhits.txt");
 	h.open("track_tables/cone_goodhits.txt");
 	k.open("track_tables/cone_badhits.txt");
 	//std::cout<<"f & g opened: CONE"<<std::endl;
 	break;
-      case(2):
+      case 2:
 	f.open("table_hourglass_goodhits.txt");
 	g.open("table_hourglass_badhits.txt");
 	h.open("track_tables/hourglass_goodhits.txt");
 	k.open("track_tables/hourglass_badhits.txt");
 	//std::cout<<"f & g opened: HOURGLASS"<<std::endl;
 	break;
-      case(3):
+      case 3:
 	f.open("table_cone_inverted_goodhits.txt");
 	g.open("table_cone_inverted_badhits.txt");
 	h.open("track_tables/cone_inverted_goodhits.txt");
@@ -1170,7 +1186,7 @@ int main (int argc, char* argv[])
 
 
 	//Test case
-      case(10):
+      case 10:
 	f.open("table_test_goodhits.txt");
 	g.open("table_test_badhits.txt");
 	h.open("track_tables/test_goodhits.txt");
@@ -1443,10 +1459,12 @@ int main (int argc, char* argv[])
 	
       }
     }
-    f.close();
-    g.close();
-    h.close();
-    k.close();
+    if (save_and_write) {
+      f.close();
+      g.close();
+      h.close();
+      k.close();
+    }
   }
   return 0;
 }
