@@ -622,11 +622,6 @@ void GetSpecificClusters (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, i
     int const StartCol = gRandom->Integer(10) + PLTU::FIRSTCOL + 5;
     int const StartRow = gRandom->Integer(10) + PLTU::FIRSTROW + 5;
 
-    //int const StartCol = gRandom->Integer(52);
-    //int const StartRow = gRandom->Integer(80);
-    //int const StartCol = gRandom->Integer(PLTU::NCOL + 20) + PLTU::FIRSTCOL - 10;
-    //int const StartRow = gRandom->Integer(PLTU::NROW + 20) + PLTU::FIRSTROW - 10;
-
     int hits[2] = {0,0};
 
     for (int r = 0; r != 3; ++r) {
@@ -685,8 +680,6 @@ void GetTracksParallelGaus (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment,
     // pick a starting point with width and offset
     int const StartCol = gRandom->Gaus( (PLTU::FIRSTCOL + PLTU::LASTCOL + 1.0) / 2.0 + ColOffset, ColWidth);
     int const StartRow = gRandom->Gaus( (PLTU::FIRSTROW + PLTU::LASTROW + 1.0) / 2.0 + RowOffset, RowWidth);
-    //int const StartCol = gRandom->Integer(PLTU::NCOL + 20) + PLTU::FIRSTCOL - 10;
-    //int const StartRow = gRandom->Integer(PLTU::NROW + 20) + PLTU::FIRSTROW - 10;
 
     int hits[2] = {0,0};
 
@@ -735,47 +728,103 @@ void GetTracksHeadOn (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int (
 {
   // This function to generate events hitting telescopes head on
 
-  int const NTelescopes = 1;
-  for (int i = 1; i <= NTelescopes; ++i) {
+//   int const NTelescopes = 1;
+//   for (int i = 1; i <= NTelescopes; ++i) {
 
-    // pick a starting point.  +/- 10 should cover shifts in alignment
-    int const StartCol = gRandom->Integer(PLTU::NCOL + 20) + PLTU::FIRSTCOL - 10;
-    int const StartRow = gRandom->Integer(PLTU::NROW + 20) + PLTU::FIRSTROW - 10;
+//     // pick a starting point.  +/- 10 should cover shifts in alignment
+//     int const StartCol = gRandom->Integer(PLTU::NCOL + 20) + PLTU::FIRSTCOL - 10;
+//     int const StartRow = gRandom->Integer(PLTU::NROW + 20) + PLTU::FIRSTROW - 10;
 
-    //int const StartCol = gRandom->Integer(52);
-    //int const StartRow = gRandom->Integer(80);
+//     int hits[2] = {0,0};
+
+//     for (int r = 0; r != 3; ++r) {
+//       //PLTAlignment::CP* C = Alignment.GetCP(i, r);
+
+//       // make straight track, see where that hits a plane if it's shifted..
+//       // Optionally give it some fuzz..
+
+//       // Use L coord system:
+//       // THINK ABOUT THIS FOR ROTATIONS...
+//       float const LX = Alignment.PXtoLX(StartCol);
+//       float const LY = Alignment.PYtoLY(StartRow);
+//       //printf("LY  %.13E\n", LY);
+
+//       std::pair<float, float> LXY = Alignment.TtoLXY(LX, LY, i, r);
+//       //printf("LXY %.13E\n", LXY.second);
+
+//       int const PX = Alignment.PXfromLX(LXY.first);
+//       int const PY = Alignment.PYfromLY(LXY.second);
+
+//       //std::cout << "PY " << PY << std::endl;
+
+//       //printf("StartCol LX PX StartRow LY PY   %2i %6.2f %2i   %2i %6.2f %2i    CLX CLY: %12.3f %12.3f\n", StartCol, LX, PX, StartRow, LY, PY, C->LX, C->LY);
+
+  static std::vector<int> Channels = Alignment.GetListOfChannels();
 
 
-    int hits[2] = {0,0};
+  static int const NTracks = 1;//gRandom->Integer(10);
 
-    for (int r = 0; r != 3; ++r) {
-      //PLTAlignment::CP* C = Alignment.GetCP(i, r);
+  for (int itrack = 0; itrack < NTracks; ++itrack) {
+    int const Channel = Channels[ gRandom->Integer(Channels.size()) ];
+    int const ROC     = gRandom->Integer(3);
+    //printf("Channel: %2i  ROC: %i\n", Channel, ROC);
 
-      // make straight track, see where that hits a plane if it's shifted..
-      // Optionally give it some fuzz..
+    float const lx = 0.8 * (gRandom->Rndm() - 0.5);
+    float const ly = 0.8 * (gRandom->Rndm() - 0.5);
+    //float const lx = 0.45 * (gRandom->Gaus(0.5,0.5)-0.5);
+    //float const ly = 0.45 * (gRandom->Gaus(0.527,5.0)-0.5);
+    //printf(" lx ly: %15E  %15E\n", lx, ly);
 
-      // Use L coord system:
-      // THINK ABOUT THIS FOR ROTATIONS...
-      float const LX = Alignment.PXtoLX(StartCol);
-      float const LY = Alignment.PYtoLY(StartRow);
-      //printf("LY  %.13E\n", LY);
+    static std::vector<float> TXYZ;
+    Alignment.LtoTXYZ(TXYZ, lx, ly, Channel, ROC);
+    //printf(" TXYZ: %15E  %15E  %15E\n", TXYZ[0], TXYZ[1], TXYZ[2]);
 
-      std::pair<float, float> LXY = Alignment.TtoLXY(LX, LY, i, r);
-      //printf("LXY %.13E\n", LXY.second);
+    static std::vector<float> GXYZ;
+    Alignment.TtoGXYZ(GXYZ, TXYZ[0], TXYZ[1], TXYZ[2], Channel, ROC);
+    //printf(" GXYZ: %15E  %15E  %15E\n", GXYZ[0], GXYZ[1], GXYZ[2]);
 
-      int const PX = Alignment.PXfromLX(LXY.first);
-      int const PY = Alignment.PYfromLY(LXY.second);
+    //float const SlopeX = GXYZ[0] / GXYZ[2];
+    //float const SlopeY = GXYZ[1] / GXYZ[2];
+    float const SlopeX = gRandom->Rndm();
+    printf("%15E\n", SlopeX);
+    float const SlopeY = gRandom->Rndm();
+    //if (Channel == 3){
+      //printf(" Slope X Y: %15E  %15E\n", SlopeX, SlopeY);}
 
-      //std::cout << "PY " << PY << std::endl;
+    int ghits[2] = {0,0};
+    
+    for (size_t r = 0; r != 3; ++r) {
+      std::vector<float> VP;
+      Alignment.LtoGXYZ(VP, 0, 0, Channel, r);
+      //printf("  VP XYZ: %15E  %15E  %15E\n", VP[0], VP[1], VP[2]);
 
-      //printf("StartCol LX PX StartRow LY PY   %2i %6.2f %2i   %2i %6.2f %2i    CLX CLY: %12.3f %12.3f\n", StartCol, LX, PX, StartRow, LY, PY, C->LX, C->LY);
+      float const GZ = VP[2];
+      float const GX = SlopeX * GZ;
+      float const GY = SlopeY * GZ;
+      //printf("ROC %1i  GXYZ: %15E  %15E  %15E\n", iroc, GX, GY, GZ);
+
+
+      std::vector<float> T;
+      Alignment.GtoTXYZ(T, GX, GY, GZ, Channel, r);
+      //if (Channel == 3) printf("HI %15E\n", GX - T[0]);
+      //if (Channel == 3)
+      //printf("ROC %1i TX TY TZ  %15E %15E %15E\n", iroc, T[0], T[1], T[2]);
+
+      std::pair<float, float> LXY = Alignment.TtoLXY(T[0], T[1], Channel, r);
+      std::pair<int, int>     PXY = Alignment.PXYfromLXY(LXY);
+
+      // Add some jitter if you want
+      PXY.first  += (int) gRandom->Gaus(0, 1.2);
+      PXY.second += (int) gRandom->Gaus(0, 1.2);
+      int const PX = PXY.first;
+      int const PY = PXY.second;
 
       // Just some random adc value
       int const adc = gRandom->Poisson(150);
 
       // Add it as a hit if it's in the range of the diamond
       if (PX >= PLTU::FIRSTCOL && PX <= PLTU::LASTCOL && PY >= PLTU::FIRSTROW && PY <= PLTU::LASTROW) {
-        Hits.push_back( new PLTHit(i, r, PX, PY, adc) );
+        Hits.push_back( new PLTHit(Channel, r, PX, PY, adc) );
 	totalhits[r] = 1;
       } else {
         //printf("StartCol LX PX StartRow LY PY   %2i %6.2f %2i   %2i %6.2f %2i\n", StartCol, LX, PX, StartRow, LY, PY);
@@ -783,7 +832,7 @@ void GetTracksHeadOn (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int (
 
       // Add to hits if in range of active pixels
       // loop for each ROC
-      CountHitsInActiveRegionBad(ACTIVEREGION,badtracksarray, r, hits, PX, PY); 
+      CountHitsInActiveRegionBad(ACTIVEREGION,badtracksarray, r, ghits, PX, PY); 
       
     }
     if (totalhits[0] == 1 && totalhits[1] == 1 && totalhits[2] == 1) {
@@ -968,7 +1017,8 @@ int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofst
         goodTracks += 1;
         GetTracksCollisions(Hits, Alignment, goodhits, ACTIVEREGION, totalhits, totalgoodhits);
         break;
-      case 1:
+      case 100:
+	// needs fixing (SlopeY_Ch15)
 	badTracks += 1;
         GetTracksHeadOnFirstROC(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
@@ -977,13 +1027,13 @@ int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofst
 	badTracks += 1;
         GetTracksHeadOn(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
-      case 3:
-	// needs fixing -> fixed??
+      case 30:
+	// needs fixing 
 	badTracks += 1;
         GetTracksParallelGaus(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
-      case 4:
-	// needs fixing -> fixed??
+      case 40:
+	// needs fixing 
 	badTracks += 1;
         GetSpecificClusters(Hits, Alignment, badhits, ACTIVEREGION, totalhits, totalbadhits);
         break;
