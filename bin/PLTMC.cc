@@ -74,14 +74,14 @@ void GetPureNoise (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int (&ba
 
   int Row, Column;
   for (/*std::vector<int>::iterator*/int ch = 0/*Channels.begin()*/; ch<1 /*!= Channels.end()*/; ++ch) {
-
+    int const Channel = Channels[ gRandom->Integer(Channels.size()) ];
     int hits[2] = {0,0};
 
     for (int iroc = 0; iroc != 3; ++iroc) {
       Column = gRandom->Integer(PLTU::NCOL) + PLTU::FIRSTCOL;
       Row    = gRandom->Integer(PLTU::NROW) + PLTU::FIRSTROW;
       if (Column >= PLTU::FIRSTCOL && Column <= PLTU::LASTCOL && Row >= PLTU::FIRSTROW && Row <= PLTU::LASTROW) {
-        Hits.push_back( new PLTHit(/***/ch, iroc, Column, Row, gRandom->Poisson(150)) );
+        Hits.push_back( new PLTHit(/***/Channel, iroc, Column, Row, gRandom->Poisson(150)) );
 	totalhits[iroc] = 1;
       } else {
         std::cout << "out of range" << std::endl;
@@ -115,8 +115,8 @@ void GetTracksCollisions (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, i
     int const ROC     = gRandom->Integer(3);
     //printf("Channel: %2i  ROC: %i\n", Channel, ROC);
 
-    float const lx = 0.8 * (gRandom->Rndm() - 0.5);
-    float const ly = 0.8 * (gRandom->Rndm() - 0.5);
+    float const lx = 0.45 * (gRandom->Rndm() - 0.5);
+    float const ly = 0.45 * (gRandom->Rndm() - 0.5);
     //float const lx = 0.45 * (gRandom->Gaus(0.5,0.5)-0.5);
     //float const ly = 0.45 * (gRandom->Gaus(0.527,5.0)-0.5);
     //printf(" lx ly: %15E  %15E\n", lx, ly);
@@ -786,67 +786,6 @@ void GetTracksHeadOn (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int (
       //std::cout << "PY " << PY << std::endl;
 
       //printf("StartCol LX PX StartRow LY PY   %2i %6.2f %2i   %2i %6.2f %2i    CLX CLY: %12.3f %12.3f\n", StartCol, LX, PX, StartRow, LY, PY, C->LX, C->LY);
-
-//   static std::vector<int> Channels = Alignment.GetListOfChannels();
-
-
-//   static int const NTracks = 1;//gRandom->Integer(10);
-
-//   for (int itrack = 0; itrack < NTracks; ++itrack) {
-//     int const Channel = Channels[ gRandom->Integer(Channels.size()) ];
-//     int const ROC     = gRandom->Integer(3);
-//     //printf("Channel: %2i  ROC: %i\n", Channel, ROC);
-
-//     float const lx = 0.8 * (gRandom->Rndm() - 0.5);
-//     float const ly = 0.8 * (gRandom->Rndm() - 0.5);
-//     //float const lx = 0.45 * (gRandom->Gaus(0.5,0.5)-0.5);
-//     //float const ly = 0.45 * (gRandom->Gaus(0.527,5.0)-0.5);
-//     //printf(" lx ly: %15E  %15E\n", lx, ly);
-
- //    static std::vector<float> TXYZ;
-//     Alignment.LtoTXYZ(TXYZ,StartCol, StartRow, Channel, ROC);
-//     //printf(" TXYZ: %15E  %15E  %15E\n", TXYZ[0], TXYZ[1], TXYZ[2]);
-
-//     static std::vector<float> GXYZ;
-//     Alignment.TtoGXYZ(GXYZ, TXYZ[0], TXYZ[1], TXYZ[2], Channel, ROC);
-//     //printf(" GXYZ: %15E  %15E  %15E\n", GXYZ[0], GXYZ[1], GXYZ[2]);
-
-//     float const SlopeX = GXYZ[0] / GXYZ[2];
-//     float const SlopeY = GXYZ[1] / GXYZ[2];
-    
-//     //printf("%15E\n", SlopeX);
-    
-//     //if (Channel == 3){
-//       //printf(" Slope X Y: %15E  %15E\n", SlopeX, SlopeY);}
-
-//     int hits[2] = {0,0};
-    
-//     for (size_t r = 0; r != 3; ++r) {
-//       std::vector<float> VP;
-//       Alignment.LtoGXYZ(VP, 0, 0, Channel, r);
-//       //printf("  VP XYZ: %15E  %15E  %15E\n", VP[0], VP[1], VP[2]);
-
-//       float const GZ = VP[2];
-//       float const GX = SlopeX * GZ;
-//       float const GY = SlopeY * GZ;
-//       //printf("ROC %1i  GXYZ: %15E  %15E  %15E\n", iroc, GX, GY, GZ);
-
-
-//       std::vector<float> T;
-//       Alignment.GtoTXYZ(T, GX, GY, GZ, Channel, r);
-//       //if (Channel == 3) printf("HI %15E\n", GX - T[0]);
-//       //if (Channel == 3)
-//       //printf("ROC %1i TX TY TZ  %15E %15E %15E\n", iroc, T[0], T[1], T[2]);
-
-//       std::pair<float, float> LXY = Alignment.TtoLXY(T[0], T[1], Channel, r);
-//       std::pair<int, int>     PXY = Alignment.PXYfromLXY(LXY);
-
-//       // Add some jitter if you want
-//       PXY.first  += (int) gRandom->Gaus(0, 1.2);
-//       PXY.second += (int) gRandom->Gaus(0, 1.2);
-//       int const PX = PXY.first;
-//       int const PY = PXY.second;
-
       // Just some random adc value
       int const adc = gRandom->Poisson(150);
 
@@ -877,7 +816,7 @@ void GetTracksHeadOnFirstROC (std::vector<PLTHit*>& Hits, PLTAlignment& Alignmen
 
   static std::vector<int> Channels = Alignment.GetListOfChannels();
 
-  for (int i = 15; i <= 15; ++i) {
+  for (int i = 1; i <= 1; ++i) {
 
     int const Channel = Channels[ gRandom->Integer(Channels.size()) ];
 
@@ -1168,7 +1107,7 @@ int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofst
   // print out good tracks vs bad tracks and others
   if (save_and_write) {
     goodarray[int(size*2.0)-int(smallest)] = float(goodhits[2])/float(totalgoodhits);//goodTracks);//goodhits[2];//int(goodTracks);//float(goodhits[2])/float(goodTracks);
-    badarray[int(size*2.0)-int(smallest)] = float(badhits[2])/float(totalbadhits);//badhits[2];//int(badTracks);//float(badhits[2])/float(badTracks);
+    badarray[int(size*2.0)-int(smallest)] = 1.0 - (float(badhits[2])/float(totalbadhits));//badhits[2];//int(badTracks);//float(badhits[2])/float(badTracks);
     //std::cout<<float(badhits[2])/float(totalbadhits[0])<<std::endl;
     goodhitsplotted[int(size*2.0)-int(smallest)] = goodhits[2];
     badhitsplotted[int(size*2.0)-int(smallest)] = badhits[2];
@@ -1219,10 +1158,10 @@ int main (int argc, char* argv[])
 
   // types of geometries
   // 0 = all equal, 1 = cone: 1st largest, 2 = hourglass, 3 = cone: 1st smallest, 10 = test
-  int shape = 0;
+  int shape = 3;
 
   // determine sizes of each ROC, numbers refer to length of square sizes in mm
-  float sizes = 8.0;
+  float sizes = 10.0;
   float size1;
   float size2;
   float size3;
@@ -1267,13 +1206,13 @@ int main (int argc, char* argv[])
 	break;
 
 
-	//Test case
-      case 10:
-	f.open("table_test_goodhits.txt");
-	g.open("table_test_badhits.txt");
-	h.open("track_tables/test_goodhits.txt");
-	k.open("track_tables/test_badhits.txt");
-      }
+// 	//Test case
+//       case 10:
+// 	f.open("table_test_goodhits.txt");
+// 	g.open("table_test_badhits.txt");
+// 	h.open("track_tables/test_goodhits.txt");
+// 	k.open("track_tables/test_badhits.txt");
+//       }
     }
     
     for (int si=int(smallest); si<=int(sizes)*2; ++si) {
@@ -1283,19 +1222,19 @@ int main (int argc, char* argv[])
       
       // adjustments of ROCs up/down, side-to-side, numbers corresponds to rows or columns
       float up[3] = {0.0,0.0,0.0};//{0.0,-1.0,-0.5};//
-      if (i == 3) {
-// 	std::cout<<"INVERTED CONE"<<std::endl;
-	up[0] = 0.0;//-0.3;//-.2*(7.0-s);
-	up[1] = 0.0;//-.1*(7.0-s);
-	up[2] = 0.0;
-	//	std::cout<<up[0]<<std::endl<<up[1]<<std::endl<<up[2]<<std::endl;
-      }
-      //test case
-      if (i == 10){
-	up[0] = -0.3;
-	up[1] = 0.0;
-	up[2] = 0.0;
-      }
+//       if (i == 3) {
+// // 	std::cout<<"INVERTED CONE"<<std::endl;
+// 	up[0] = 0.0;//-0.3;//-.2*(7.0-s);
+// 	up[1] = 0.0;//-.1*(7.0-s);
+// 	up[2] = 0.0;
+// 	//	std::cout<<up[0]<<std::endl<<up[1]<<std::endl<<up[2]<<std::endl;
+//       }
+//       //test case
+//       if (i == 10){
+// 	up[0] = -0.3;
+// 	up[1] = 0.0;
+// 	up[2] = 0.0;
+//       }
       //else {
       //
       //}
@@ -1340,26 +1279,27 @@ int main (int argc, char* argv[])
 	size3 = s;
 	break;
       case(1):
-	size1 = s;
-	size2 = s - 1.0;
-	size3 = s - 2.0;
+	size1 = s + 2.0;
+	size2 = s + 1.0;
+	size3 = s;
 	break;
       case(2):
-	size1 = s;
-	size2 = s - 1.0;
-	size3 = s;
+	size1 = s + 1.0;
+	size2 = s;
+	size3 = s + 1.0;
 	break;
       case(3):
-	size1 = s - 1.0;
-	size2 = s - 0.5;
-	size3 = s;
-
-	//test case
-      case(10):
-	size1 = s - 2.0;
-	size2 = s;
-	size3 =s;
+	size1 = s;
+	size2 = s + 1.0;
+	size3 = s + 2.0;
 	break;
+
+// 	//test case
+//       case(10):
+// 	size1 = s - 2.0;
+// 	size2 = s;
+// 	size3 =s;
+// 	break;
       }
       
       // Adjust active regions according to shape, size, and bumps
@@ -1367,137 +1307,36 @@ int main (int argc, char* argv[])
       float dcol1 = 51.0 * (float(size1) / 8.0);
       float drow1 = 79.0 * (float(size1) / 8.0);
       ACTIVEFIRSTCOL1 += int(((51.0 - dcol1) / 2.0) + (51.0 * (right[0] / 8.0)));
-      if (ACTIVEFIRSTCOL1 < 0) {ACTIVEFIRSTCOL1 = 0;}
+      //if (ACTIVEFIRSTCOL1 < 0) {ACTIVEFIRSTCOL1 = 0;}
       ACTIVELASTCOL1 -= ACTIVEFIRSTCOL1 - int((51.0 * (right[0] / 8.0)));
-      if (ACTIVELASTCOL1 > 51) {ACTIVELASTCOL1 = 51;}
+      //if (ACTIVELASTCOL1 > 51) {ACTIVELASTCOL1 = 51;}
       ACTIVEFIRSTROW1 += int(((79.0 - drow1) / 2.0) + (79.0 * (up[0] / 8.0)));
-      if (ACTIVEFIRSTROW1 < 0) {ACTIVEFIRSTROW1 = 0;}
+      //if (ACTIVEFIRSTROW1 < 0) {ACTIVEFIRSTROW1 = 0;}
       ACTIVELASTROW1 -= ACTIVEFIRSTROW1 - int(79.0 * (up[0] / 8.0));
-      if (ACTIVELASTROW1 > 79) {ACTIVELASTROW1 = 79;}
+      //if (ACTIVELASTROW1 > 79) {ACTIVELASTROW1 = 79;}
       
       float dcol2 = 51.0 * (float(size2) / 8.0);
       float drow2 = 79.0 * (float(size2) / 8.0);
       ACTIVEFIRSTCOL2 += int(((51.0 - dcol2) / 2.0) + (51.0 * (right[1] / 8.0)));
-      if (ACTIVEFIRSTCOL2 < 0) {ACTIVEFIRSTCOL2 = 0;}
+      //if (ACTIVEFIRSTCOL2 < 0) {ACTIVEFIRSTCOL2 = 0;}
       ACTIVELASTCOL2 -= ACTIVEFIRSTCOL2 - int((51.0 * (right[1] / 8.0)));
-      if (ACTIVELASTCOL2 > 51) {ACTIVELASTCOL2 = 51;}
+      //if (ACTIVELASTCOL2 > 51) {ACTIVELASTCOL2 = 51;}
       ACTIVEFIRSTROW2 += int(((79.0 - drow2) / 2.0) + (79.0 * (up[1] / 8.0)));
-      if (ACTIVEFIRSTROW2 < 0) {ACTIVEFIRSTROW2 = 0;}
+      //if (ACTIVEFIRSTROW2 < 0) {ACTIVEFIRSTROW2 = 0;}
       ACTIVELASTROW2 -= ACTIVEFIRSTROW2 - int(79.0 * (up[1] / 8.0));
-      if (ACTIVELASTROW2 > 79) {ACTIVELASTROW2 = 79;}
+      //if (ACTIVELASTROW2 > 79) {ACTIVELASTROW2 = 79;}
       
       float dcol3 = 51.0 * (float(size3) / 8.0);
       float drow3 = 79.0 * (float(size3) / 8.0);
       ACTIVEFIRSTCOL3 += int(((51.0 - dcol3) / 2.0) + (51.0 * (right[2] / 8.0)));
-      if (ACTIVEFIRSTCOL3 < 0) {ACTIVEFIRSTCOL3 = 0;}
+      //if (ACTIVEFIRSTCOL3 < 0) {ACTIVEFIRSTCOL3 = 0;}
       ACTIVELASTCOL3 -= ACTIVEFIRSTCOL3 - int((51.0 * (right[2] / 8.0)));
-      if (ACTIVELASTCOL3 > 51) {ACTIVELASTCOL3 = 51;}
+      //if (ACTIVELASTCOL3 > 51) {ACTIVELASTCOL3 = 51;}
       ACTIVEFIRSTROW3 += int(((79.0 - drow3) / 2.0) + (79.0 * (up[2] / 8.0)));
-      if (ACTIVEFIRSTROW3 < 0) {ACTIVEFIRSTROW3 = 0;}
+      //if (ACTIVEFIRSTROW3 < 0) {ACTIVEFIRSTROW3 = 0;}
       ACTIVELASTROW3 -= ACTIVEFIRSTROW3 - int(79.0 * (up[2] / 8.0));
-      if (ACTIVELASTROW3 > 79) {ACTIVELASTROW3 = 79;}
+      //if (ACTIVELASTROW3 > 79) {ACTIVELASTROW3 = 79;}
       
-      //   for (int i = 1; i<=divide; ++i) {
-      //     //sets active regions for the ROCs
-      
-      //     int ACTIVEFIRSTCOL1;
-      //     int ACTIVELASTCOL1;
-      //     int ACTIVEFIRSTROW1;
-      //     int ACTIVELASTROW1;
-      //     int ACTIVEFIRSTCOL2;
-      //     int ACTIVELASTCOL2;
-      //     int ACTIVEFIRSTROW2;
-      //     int ACTIVELASTROW2;
-      //     int ACTIVEFIRSTCOL3;
-      //     int ACTIVELASTCOL3;
-      //     int ACTIVEFIRSTROW3;
-      //     int ACTIVELASTROW3;
-      
-      //     // Max values: Columns: 51, Rows: 79
-      
-      //     // dividing normal second ROC
-      //     ACTIVEFIRSTCOL1 = 0;
-      //     ACTIVELASTCOL1 = 51;
-      //     ACTIVEFIRSTROW1 = 0;
-      //     ACTIVELASTROW1 = 79;
-      //     ACTIVEFIRSTCOL2 = int((51.0 - (51.0/sqrt(i)))/2.0);
-      //     ACTIVELASTCOL2 = 51 - int((51.0 - (51.0/sqrt(i)))/2.0);
-      //     ACTIVEFIRSTROW2 = int((79.0 - (79.0/sqrt(i)))/2.0);
-      //     ACTIVELASTROW2 = 79 - int((79.0 - (79.0/sqrt(i)))/2.0);
-      //     ACTIVEFIRSTCOL3 = 0;
-      //     ACTIVELASTCOL3 = 51;
-      //     ACTIVEFIRSTROW3 = 0;
-      //     ACTIVELASTROW3 = 79;
-      
-      //     // dividing by powers of 2 second ROC
-      // //     int ACTIVEFIRSTCOL1 = 0;
-      // //     int ACTIVELASTCOL1 = 51;
-      // //     int ACTIVEFIRSTROW1 = 0;
-      // //     int ACTIVELASTROW1 = 79;
-      // //     int ACTIVEFIRSTCOL2 = int((51.0 - (51.0/pow(2.0,float(i))))/2.0);
-      // //     int ACTIVELASTCOL2 = 51 - int((51.0 - (51.0/pow(2.0,float(i))))/2.0);
-      // //     int ACTIVEFIRSTROW2 = int((79.0 - (79.0/pow(2.0,float(i))))/2.0);
-      // //     int ACTIVELASTROW2 = 79 - int((79.0 - (79.0/pow(2.0,float(i))))/2.0);
-      // //     int ACTIVEFIRSTCOL3 = 0;
-      // //     int ACTIVELASTCOL3 = 51;
-      // //     int ACTIVEFIRSTROW3 = 0;
-      // //     int ACTIVELASTROW3 = 79;
-      
-      //     // dividing normally first roc
-      // //     int ACTIVEFIRSTCOL1 = int((51.0 - (51.0/sqrt(i+3)))/2.0);
-      // //     int ACTIVELASTCOL1 = 51 - int((51.0 - (51.0/sqrt(i+3)))/2.0);
-      // //     int ACTIVEFIRSTROW1 = int((79.0 - (79.0/sqrt(i+3)))/2.0);
-      // //     int ACTIVELASTROW1 = 79 - int((79.0 - (79.0/sqrt(i+3)))/2.0);
-      // //     int ACTIVEFIRSTCOL2 =0;
-      // //     int ACTIVELASTCOL2 = 51;
-      // //     int ACTIVEFIRSTROW2 = 0;
-      // //     int ACTIVELASTROW2 = 79;
-      // //     int ACTIVEFIRSTCOL3 = 0;
-      // //     int ACTIVELASTCOL3 = 51;
-      // //     int ACTIVEFIRSTROW3 = 0;
-      // //     int ACTIVELASTROW3 = 79;
-      
-      //     // divide 1st ROC powers of 2
-      // //     int ACTIVEFIRSTCOL1 = int((51.0 - (51.0/pow(2.0,float(i))))/2.0);
-      // //     int ACTIVELASTCOL1 = 51 - int((51.0 - (51.0/pow(2.0,float(i))))/2.0);
-      // //     int ACTIVEFIRSTROW1 = int((79.0 - (79.0/pow(2.0,float(i))))/2.0);
-      // //     int ACTIVELASTROW1 = 79 - int((79.0 - (79.0/pow(2.0,float(i))))/2.0);
-      // //     int ACTIVEFIRSTCOL2 =0;
-      // //     int ACTIVELASTCOL2 = 51;
-      // //     int ACTIVEFIRSTROW2 = 0;
-      // //     int ACTIVELASTROW2 = 79;
-      // //     int ACTIVEFIRSTCOL3 = 0;
-      // //     int ACTIVELASTCOL3 = 51;
-      // //     int ACTIVEFIRSTROW3 = 0;
-      // //     int ACTIVELASTROW3 = 79;
-
-      //     // dividing normally third ROC
-      // //     int ACTIVEFIRSTCOL1 = 0;
-      // //     int ACTIVELASTCOL1 = 51;
-      // //     int ACTIVEFIRSTROW1 = 0;
-      // //     int ACTIVELASTROW1 = 79;
-      // //     int ACTIVEFIRSTCOL2 =0;
-      // //     int ACTIVELASTCOL2 = 51;
-      // //     int ACTIVEFIRSTROW2 = 0;
-      // //     int ACTIVELASTROW2 = 79;
-      // //     int ACTIVEFIRSTCOL3 = int((51.0 - (51.0/sqrt(i+3)))/2.0);
-      // //     int ACTIVELASTCOL3 = 51 - int((51.0 - (51.0/sqrt(i+3)))/2.0);
-      // //     int ACTIVEFIRSTROW3 = int((79.0 - (79.0/sqrt(i+3)))/2.0);
-      // //     int ACTIVELASTROW3 = 79 - int((79.0 - (79.0/sqrt(i+3)))/2.0);
-
-      //     // dividing third ROC powers of 2
-      // //     int ACTIVEFIRSTCOL1 = 0;
-      // //     int ACTIVELASTCOL1 = 51;
-      // //     int ACTIVEFIRSTROW1 = 0;
-      // //     int ACTIVELASTROW1 = 79;
-      // //     int ACTIVEFIRSTCOL2 =0;
-      // //     int ACTIVELASTCOL2 = 51;
-      // //     int ACTIVEFIRSTROW2 = 0;
-      // //     int ACTIVELASTROW2 = 79;
-      // //     int ACTIVEFIRSTCOL3 = int((51.0 - (51.0/pow(2.0,float(i))))/2.0);
-      // //     int ACTIVELASTCOL3 = 51 - int((51.0 - (51.0/pow(2.0,float(i))))/2.0);
-      // //     int ACTIVEFIRSTROW3 = int((79.0 - (79.0/pow(2.0,float(i))))/2.0);
-      // //     int ACTIVELASTROW3 = 79 - int((79.0 - (79.0/pow(2.0,float(i))))/2.0);
 
       int ACTIVEREGION[12] = 
 	{
