@@ -74,7 +74,7 @@ TH1F* FidHistFrom2D (TH2F* hIN, TString const NewName, int const NBins, PLTPlane
 
 // CODE BELOW
 
-int OccupancyPlots (std::string const DataFileName)
+int OccupancyPlots (std::string const DataFileName, bool IsText)
 {
   // Set some basic style
   PLTU::SetStyle();
@@ -82,7 +82,7 @@ int OccupancyPlots (std::string const DataFileName)
   std::cout << "DataFileName:    " << DataFileName << std::endl;
 
   // Grab the plt event reader
-  PLTEvent Event(DataFileName);
+  PLTEvent Event(DataFileName,IsText);
   //Event.SetPlaneClustering(PLTPlane::kClustering_NoClustering);
   PLTPlane::FiducialRegion MyFiducialRegion = PLTPlane::kFiducialRegion_All;
   //  Event.SetPlaneClustering(PLTPlane::kClustering_AllTouching);
@@ -481,7 +481,24 @@ int main (int argc, char* argv[])
   }
 
   std::string const DataFileName = argv[1];
-  OccupancyPlots(DataFileName);
+  //  OccupancyPlots(DataFileName);
+
+  if(DataFileName.substr(DataFileName.find_last_of(".")+1) == "dat")
+    {
+      OccupancyPlots(DataFileName,false);
+    }
+  else if(DataFileName.substr(DataFileName.find_last_of(".")+1) == "txt")
+    {
+      OccupancyPlots(DataFileName,true);
+    }
+  else
+    {
+    std::cerr << "Usage: please make sure the provided datafile ends on .dat or .txt" << std::endl;
+    return 1;
+    }
+
+
+
 
   return 0;
 }

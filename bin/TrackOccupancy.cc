@@ -14,7 +14,7 @@
 #include "PLTU.h"
 #include "TFile.h"
 
-int TrackOccupancy (std::string const DataFileName, std::string const GainCalFileName, std::string const AlignmentFileName)
+int TrackOccupancy (std::string const DataFileName, std::string const GainCalFileName, std::string const AlignmentFileName, bool IsText)
 {
   std::cout << "DataFileName:    " << DataFileName << std::endl;
   TFile *f = new TFile("histo_track_occupancy.root","RECREATE");
@@ -23,7 +23,7 @@ int TrackOccupancy (std::string const DataFileName, std::string const GainCalFil
   PLTU::SetStyle();
 
   // Grab the plt event reader
-  PLTEvent Event(DataFileName, GainCalFileName, AlignmentFileName);
+  PLTEvent Event(DataFileName, GainCalFileName, AlignmentFileName,IsText);
   Event.SetPlaneFiducialRegion(PLTPlane::kFiducialRegion_All);
   Event.SetPlaneClustering(PLTPlane::kClustering_AllTouching, PLTPlane::kFiducialRegion_All);
 
@@ -122,7 +122,24 @@ int main (int argc, char* argv[])
   std::string const GainCalFileName = argv[2];
   std::string const AlignmentFileName = argv[3];
 
-  TrackOccupancy(DataFileName, GainCalFileName, AlignmentFileName);
+
+
+  if(DataFileName.substr(DataFileName.find_last_of(".")+1) == "dat")
+    {
+      TrackOccupancy(DataFileName, GainCalFileName, AlignmentFileName,false);
+    }
+  else if(DataFileName.substr(DataFileName.find_last_of(".")+1) == "txt")
+    {
+      TrackOccupancy(DataFileName, GainCalFileName, AlignmentFileName,true);
+    }
+  else
+    {
+    std::cerr << "Usage: please make sure the provided datafile ends on .dat or .txt" << std::endl;
+    return 1;
+    }
+
+
+
 
   return 0;
 }
