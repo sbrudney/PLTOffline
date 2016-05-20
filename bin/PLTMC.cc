@@ -115,8 +115,8 @@ void GetTracksCollisions (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, i
     int const ROC     = gRandom->Integer(3);
     //printf("Channel: %2i  ROC: %i\n", Channel, ROC);
 
-    float const lx = 0.45 * (gRandom->Rndm() - 0.5);
-    float const ly = 0.45 * (gRandom->Rndm() - 0.5);
+    float const lx = 0.45 * (gRandom->Rndm() - 0.25);
+    float const ly = 0.45 * (gRandom->Rndm() - 0.25);
     //float const lx = 0.45 * (gRandom->Gaus(0.5,0.5)-0.5);
     //float const ly = 0.45 * (gRandom->Gaus(0.527,5.0)-0.5);
     //printf(" lx ly: %15E  %15E\n", lx, ly);
@@ -377,8 +377,10 @@ void GetTracksRandomSlope (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, 
       int const StartRow = gRandom->Integer(PLTU::NROW) + PLTU::FIRSTROW;
 
       float const SlopeX = 9.0 * (gRandom->Rndm() - 0.5);
-      float const SlopeY = 9.0 * (gRandom->Rndm() - 0.5);
-
+      float const SlopeY = 5.0 * (gRandom->Rndm() - 0.9);
+      //float const SlopeY = .02+9.0*(gRandom->Gaus(0.027,0.2));
+      //if (Channel == 3){
+      //printf(" Slope X Y: %15E  %15E\n", SlopeX, SlopeY);}
       int hits[2] = {0,0};
 
       for (int r = 0; r != 3; ++r) {
@@ -872,8 +874,9 @@ void GetTracksHeadOnFirstROC (std::vector<PLTHit*>& Hits, PLTAlignment& Alignmen
 void GetGausHitsOneROC (std::vector<PLTHit*>& Hits, PLTAlignment& Alignment, int (&badtracksarray)[3], int ACTIVEREGION[], int (&totalhits)[3], int& totalbadhits)
 {
   // This function to generate events hitting telescopes head on
-
-  int const Channel = 1;
+  static std::vector<int> Channels = Alignment.GetListOfChannels();
+  int const Channel = Channels[ gRandom->Integer(Channels.size()) ];
+//int const Channel = 1;
 
   float const ColOffset = 0;
   float const RowOffset = 0;
@@ -929,6 +932,7 @@ int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofst
   //Alignment.ReadAlignmentFile("ALIGNMENT/Alignment_PLTMC.dat");
   //Alignment.ReadAlignmentFile("ALIGNMENT/Alignment_IdealInstall.dat");
   Alignment.ReadAlignmentFile("ALIGNMENT/Alignment_IdealInstall_editted.dat");
+  //Alignment.ReadAlignmentFile("ALIGNMENT/Trans_Alignment_4449.dat");
 
   // Vector of hits for each event
   std::vector<PLTHit*> Hits;
@@ -973,7 +977,8 @@ int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofst
     int random_number = rand() % 100 + 1;
     int choice;
     if (random_number <= 88){choice = 0;}
-    else {choice = 1+ rand() % 12;}
+    else if (random_number <= 101) {choice = 8;}
+    //else {choice = 1+ rand() % 12;}
 
     int totalhits[3];
     totalhits[0] = 0;
@@ -982,7 +987,7 @@ int PLTMC (int ACTIVEREGION[], bool save_and_write, std::ofstream&  f, std::ofst
 
     switch(choice) {
       //// default: switch was at 0 for only good tracks
-      //// 13 options available, set currently for case 0
+
       //// case 0 are "good tracks" from collision point
       case 0:
         goodTracks += 1;
@@ -1165,7 +1170,7 @@ int main (int argc, char* argv[])
   float size1;
   float size2;
   float size3;
-  float smallest = 0.0;
+  float smallest = 9.0;
 
   // files to be created to store values to be plotted in gnuplot
   std::ofstream f,g,h,k;
@@ -1213,7 +1218,7 @@ int main (int argc, char* argv[])
 // 	h.open("track_tables/test_goodhits.txt");
 // 	k.open("track_tables/test_badhits.txt");
 //       }
-    }
+      }
     
     for (int si=int(smallest); si<=int(sizes)*2; ++si) {
       
@@ -1222,13 +1227,13 @@ int main (int argc, char* argv[])
       
       // adjustments of ROCs up/down, side-to-side, numbers corresponds to rows or columns
       float up[3] = {0.0,0.0,0.0};//{0.0,-1.0,-0.5};//
-//       if (i == 3) {
+      if (i == 3) {
 // // 	std::cout<<"INVERTED CONE"<<std::endl;
-// 	up[0] = 0.0;//-0.3;//-.2*(7.0-s);
-// 	up[1] = 0.0;//-.1*(7.0-s);
-// 	up[2] = 0.0;
-// 	//	std::cout<<up[0]<<std::endl<<up[1]<<std::endl<<up[2]<<std::endl;
-//       }
+	up[0] = 0.0;//-0.3;//-.2*(7.0-s);
+	up[1] = 0.0;//-.1*(7.0-s);
+	up[2] = 0.0;
+	//	std::cout<<up[0]<<std::endl<<up[1]<<std::endl<<up[2]<<std::endl;
+      }
 //       //test case
 //       if (i == 10){
 // 	up[0] = -0.3;
@@ -1386,6 +1391,7 @@ int main (int argc, char* argv[])
       h.close();
       k.close();
     }
-  }
+    
+    }}
   return 0;
 }

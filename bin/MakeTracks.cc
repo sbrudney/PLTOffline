@@ -75,8 +75,8 @@ int MakeTracks (std::string const DataFileName, std::string const GainCalFileNam
       if (!MapSlopeY[Telescope->Channel()]) {
         TString Name = TString::Format("SlopeY_Ch%i", Telescope->Channel());
         MapSlopeY[Telescope->Channel()] = new TH1F(Name, Name, 40, -0.02, 0.06);
-        MapSlopeY[Telescope->Channel()]->SetXTitle("Local Telescope Track-SlopeY #DeltaY/#DeltaZ");
-        Name = TString::Format("SlopeX_Ch%i", Telescope->Channel());
+        MapSlopeY[Telescope->Channel()]->SetXTitle("Local Telescope Track-SlopeY #DeltaY/#DeltaZ");        
+	Name = TString::Format("SlopeX_Ch%i", Telescope->Channel());
         MapSlopeX[Telescope->Channel()] = new TH1F(Name, Name, 40, -0.04, 0.04);
         MapSlopeX[Telescope->Channel()]->SetXTitle("Local Telescope Track-SlopeX #DeltaX/#DeltaZ");
         Name = TString::Format("Slope2D_Ch%i", Telescope->Channel());
@@ -128,13 +128,17 @@ int MakeTracks (std::string const DataFileName, std::string const GainCalFileNam
         MapResidualX[Telescope->Channel()*10+1]->Fill(Track->LResidualX(1));
         MapResidualY[Telescope->Channel()*10+2]->Fill(Track->LResidualY(2));
         MapResidualX[Telescope->Channel()*10+2]->Fill(Track->LResidualX(2));
-
       }
     }
-
-
   }
-
+  
+  for(std::map<int, TH1F*>::iterator it = MapSlopeY.begin(); it != MapSlopeY.end(); ++it)
+    {
+      Double_t norm = it->second->Integral();
+      //std::cout<<"Scale: "<<norm<<std::endl;
+      it->second->Scale(1/norm);
+      
+    }
 
   TFile *f = new TFile("histo_slopes.root","RECREATE");
 
