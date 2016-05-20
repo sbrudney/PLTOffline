@@ -24,7 +24,7 @@
 //Calculate alignment takes a data file of hopefully straight tracks and aligns the planes in all telescopes behind the first plane in the ideal way.
 //produces ROTATED_Alignment.dat after the fixes to Local Rotation and then Trans_Alignment after fixing the X and Y offsets remaining after rot fix.
 
-int GenerateAlignment (std::string const DataFileName, std::string const GainCalFileName, std::string const AlignmentFileName)
+int GenerateAlignment (std::string const DataFileName, std::string const GainCalFileName, std::string const AlignmentFileName, bool IsText)
 {
   std::cout << "DataFileName:    " << DataFileName << std::endl;
   std::cout << "GainCalFileName:    " << GainCalFileName << std::endl;
@@ -46,7 +46,7 @@ int GenerateAlignment (std::string const DataFileName, std::string const GainCal
   //****************************************************************************************
   //First Corrections --rotational
   //input "InitialAlignment" output "RotatedAlignment"
-  PLTEvent Event1(DataFileName, GainCalFileName, AlignmentFileName);
+  PLTEvent Event1(DataFileName, GainCalFileName, AlignmentFileName,IsText);
   Event1.SetPlaneFiducialRegion(PLTPlane::kFiducialRegion_All);
   Event1.SetPlaneClustering(PLTPlane::kClustering_AllTouching, PLTPlane::kFiducialRegion_All);
   std::cout << "DataFileName:    " << DataFileName << std::endl;
@@ -619,7 +619,21 @@ int main (int argc, char* argv[]){
   std::string const GainCalFileName= argv[2];
   std::string const AlignmentFileName= argv[3];
 
-  GenerateAlignment(DataFileName, GainCalFileName, AlignmentFileName);
+
+ if(DataFileName.substr(DataFileName.find_last_of(".")+1) == "dat")
+    {
+      GenerateAlignment(DataFileName, GainCalFileName, AlignmentFileName,false);
+    }
+  else if(DataFileName.substr(DataFileName.find_last_of(".")+1) == "txt")
+    {
+      GenerateAlignment(DataFileName, GainCalFileName, AlignmentFileName,true);
+    }
+  else
+    {
+    std::cerr << "Usage: please make sure the provided datafile ends on .dat or .txt" << std::endl;
+    return 1;
+    }
+
 
 
   return 0;

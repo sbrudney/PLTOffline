@@ -52,7 +52,7 @@ int TrackOccupancy (std::string const DataFileName, std::string const GainCalFil
 
       // If this hists for this telescope don't exist create them
       int const Channel = Telescope->Channel();
-
+      //std::cout << Channel << std::endl;
       if (hMap.count(Channel * 10) == 0) {
         char BUFF[500]; 
         TString Name = TString::Format("TrackOccupancy_Ch%02i_ROC%1i", Channel, 0);
@@ -66,6 +66,7 @@ int TrackOccupancy (std::string const DataFileName, std::string const GainCalFil
         cMap[Channel]->Divide(3,1);
       }
 
+      // std::cout << "NTracks: " << Telescope->NTracks() << std::endl;
       for (size_t itrack = 0; itrack != Telescope->NTracks(); ++itrack) {
         PLTTrack* Track = Telescope->Track(itrack);
         PLTCluster* ClustTest = Track->Cluster(1);

@@ -16,10 +16,10 @@
 #include "PLTU.h"
 #include "TFile.h"
 
-int MeasureAccidentals(const std::string, const std::string, const std::string, const std::string);
+int MeasureAccidentals(const std::string, const std::string, const std::string, const std::string, const bool IsText);
 
 int MeasureAccidentals(const std::string DataFileName, const std::string GainCalFileName, const std::string AlignmentFileName,
-		       const std::string TrackDistributionFileName, const std::string TimestampFileName)
+		       const std::string TrackDistributionFileName, const std::string TimestampFileName, const bool IsText)
 {
   std::cout << "DataFileName:      " << DataFileName << std::endl;
   std::cout << "GainCalFileName:   " << GainCalFileName << std::endl;
@@ -115,7 +115,7 @@ int MeasureAccidentals(const std::string DataFileName, const std::string GainCal
   }
 
   // Grab the plt event reader
-  PLTEvent Event(DataFileName, GainCalFileName, AlignmentFileName);
+  PLTEvent Event(DataFileName, GainCalFileName, AlignmentFileName,IsText);
 
   PLTPlane::FiducialRegion FidRegionHits  = PLTPlane::kFiducialRegion_All;
   //PLTPlane::FiducialRegion FidRegionTrack = PLTPlane::kFiducialRegion_All;
@@ -521,7 +521,24 @@ int main (int argc, char* argv[])
   const std::string TrackDistributionFileName = argv[4];
   const std::string TimestampFileName = (argc == 6) ? argv[5] : "";
 
-  MeasureAccidentals(DataFileName, GainCalFileName, AlignmentFileName, TrackDistributionFileName, TimestampFileName);
+  
+
+  if(DataFileName.substr(DataFileName.find_last_of(".")+1) == "dat")
+    {
+      MeasureAccidentals(DataFileName, GainCalFileName, AlignmentFileName, TrackDistributionFileName, TimestampFileName,false);  
+    }
+  else if(DataFileName.substr(DataFileName.find_last_of(".")+1) == "txt")
+    {
+      MeasureAccidentals(DataFileName, GainCalFileName, AlignmentFileName, TrackDistributionFileName, TimestampFileName,true);
+    }
+  else
+    {
+    std::cerr << "Usage: please make sure the provided datafile ends on .dat or .txt" << std::endl;
+    return 1;
+    }
+
+
+
 
   return 0;
 }
