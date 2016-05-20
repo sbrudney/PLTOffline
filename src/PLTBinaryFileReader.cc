@@ -316,6 +316,7 @@ int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<P
       // only keep hits on the diamond
       if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
         Hits.push_back(Hit);
+	//	std::cout << "Hit: " << Channel << ":" << ROC << ":" << Col << ":" << Row << ":" << ADC << std::endl;
       } else {
         delete Hit;
       }

@@ -55,6 +55,7 @@ int PLTTextFileReader::ReadEventHits (std::ifstream& InFile, std::vector<PLTHit>
     LineStr.str(Line);
 
     LineStr >> Channel >> ROC >> Col >> Row >> ADC >> EventNumber;
+    std::cout << Channel << " " << ROC << " " << Col << " " << Row << " " << ADC << " " << EventNumber << std::endl;
 
 
     if (EventNumber != LastEventNumber && LastEventNumber != -1) {

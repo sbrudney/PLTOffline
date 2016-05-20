@@ -129,7 +129,14 @@ float PLTGainCal::GetCharge(int const ch, int const roc, int const col, int cons
     printf("%2i %1i %2i %2i %4i %10.1f\n", ch, roc, col, row, adc, charge);
   }
 
-  return charge;
+  if(isinf(charge))
+    {
+      return 9786543;
+    }
+  else
+    {
+      return charge;
+    }
 }
 
 void PLTGainCal::ReadGainCalFile (std::string const GainCalFileName)

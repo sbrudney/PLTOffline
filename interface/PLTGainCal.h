@@ -6,6 +6,7 @@
 #include <string>
 #include <sstream>
 #include <map>
+#include <math.h>
 
 #include "TString.h"
 #include "TMath.h"

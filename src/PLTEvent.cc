@@ -207,6 +207,7 @@ void PLTEvent::MakeEvent ()
   if (GetTrackingAlgorithm()) {
     for (std::vector<PLTTelescope*>::iterator iTelescope = fTelescopes.begin(); iTelescope != fTelescopes.end(); ++iTelescope) {
       RunTracking(**iTelescope);
+      //      std::cout << "Running Tracking" << std::endl;
     }
   }
 
@@ -276,6 +277,13 @@ int PLTEvent::GetNextEvent ()
       }
     }
   }
+
+//     for (std::vector<PLTHit*>::iterator it = fHits.begin(); it != fHits.end(); ++it) {
+
+//       std::cout << "aGC hit: " << (**it).Channel()<<":"<< (**it).ROC()<<":"<< (**it).Column()<<":"<< (**it).Row()<<":"<< (**it).ADC() << ":" << (**it).Charge() << std::endl;
+
+//     }
+
 
   // Now make the event into some useful form
   MakeEvent();
