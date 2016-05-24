@@ -19,7 +19,7 @@ class PLTEvent : public PLTTracking
     PLTEvent (std::string const, std::string const, bool const IsText = false);
     PLTEvent (std::string const, std::string const, std::string const, bool const IsText = false);
     //Adding a mask
-    PLTEvent (std::string const, std::string const, std::string const, bool const IsText = false, std::string const);
+    PLTEvent (std::string const, std::string const, std::string const, std::string const, bool const IsText = false);
     ~PLTEvent ();
 
 
