@@ -42,6 +42,19 @@ PLTEvent::PLTEvent (std::string const DataFileName, std::string const GainCalFil
   SetTrackingAlgorithm(PLTTracking::kTrackingAlgorithm_01to2_All);
 }
 
+PLTEvent::PLTEvent (std::string const DataFileName, std::string const GainCalFileName, std::string const AlignmentFileName, bool const IsText, std::string const MaskName)
+{
+  // Constructor, which will also give you access to the gaincal values
+  fBinFile.SetIsText(IsText);
+  fBinFile.Open(DataFileName);
+  fGainCal.ReadGainCalFile(GainCalFileName);
+  fAlignment.ReadAlignmentFile(AlignmentFileName);
+  
+  SetDefaults();
+
+  SetTrackingAlignment(&fAlignment);
+  SetTrackingAlgorithm(PLTTracking::kTrackingAlgorithm_01to2_All);
+}
 
 PLTEvent::~PLTEvent ()
 {
