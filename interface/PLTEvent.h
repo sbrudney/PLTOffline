@@ -35,6 +35,7 @@ class PLTEvent : public PLTTracking
     size_t NTelescopes ();
     PLTTelescope* Telescope (size_t);
 
+
     void Clear ();
     void AddHit (PLTHit&);
     void AddHit (PLTHit*);

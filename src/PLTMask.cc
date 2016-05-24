@@ -88,6 +88,7 @@ void PLTMask::WriteMaskFile (std::string const OutFileName)
     fprintf(Out, "\n");
     fprintf(Out, "%2i\n", MaskType);
 
+
     for (int iroc = 0; iroc !=3; ++iroc) {
       std::pair<int, int> Nameiroc = std::make_pair(MaskType, iroc);
 
