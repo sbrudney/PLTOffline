@@ -35,7 +35,7 @@ PLTEvent::PLTEvent (std::string const DataFileName, std::string const GainCalFil
   fBinFile.Open(DataFileName);
   fGainCal.ReadGainCalFile(GainCalFileName);
   fAlignment.ReadAlignmentFile(AlignmentFileName);
-  
+
   SetDefaults();
 
   SetTrackingAlignment(&fAlignment);
@@ -43,14 +43,16 @@ PLTEvent::PLTEvent (std::string const DataFileName, std::string const GainCalFil
 }
 
 
-PLTEvent::PLTEvent (std::string const DataFileName, std::string const GainCalFileName, std::string const AlignmentFileName, std::string const MaskName, bool const IsText) 
+PLTEvent::PLTEvent (std::string const DataFileName, std::string const GainCalFileName, std::string const AlignmentFileName, std::string const MaskFileName, bool const IsText) 
 {
   // Constructor, which will also give you access to the gaincal values
   fBinFile.SetIsText(IsText);
   fBinFile.Open(DataFileName);
   fGainCal.ReadGainCalFile(GainCalFileName);
   fAlignment.ReadAlignmentFile(AlignmentFileName);
-  
+  if (MaskFileName != "blank"){
+    fMask.ReadMaskFile(MaskFileName);
+  }
   SetDefaults();
 
   SetTrackingAlignment(&fAlignment);
@@ -90,7 +92,10 @@ PLTAlignment* PLTEvent::GetAlignment ()
   return &fAlignment;
 }
 
-
+PLTMask* PLTEvent::GetMask ()
+{
+  return &fMask;
+}
 
 
 size_t PLTEvent::NPlanes ()

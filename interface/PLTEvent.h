@@ -6,6 +6,7 @@
 #include "PLTGainCal.h"
 #include "PLTAlignment.h"
 #include "PLTTracking.h"
+#include "PLTMask.h"
 
 
 #include <map>
@@ -45,6 +46,7 @@ class PLTEvent : public PLTTracking
     void SetPlaneClustering (PLTPlane::Clustering, PLTPlane::FiducialRegion);
 
     PLTAlignment* GetAlignment ();
+    PLTMask* GetMask ();
 
     unsigned long EventNumber ()
     { 
@@ -106,6 +108,7 @@ class PLTEvent : public PLTTracking
     PLTGainCal fGainCal;
     PLTBinaryFileReader fBinFile;
     PLTAlignment fAlignment;
+    PLTMask fMask;
 
     PLTPlane::Clustering fClustering;
     PLTPlane::FiducialRegion fFiducial;

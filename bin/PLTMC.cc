@@ -728,8 +728,8 @@ int PLTMC ()
   //Alignment.ReadAlignmentFile("ALIGNMENT/Alignment_IdealCastor.dat");
   //Alignment.ReadAlignmentFile("ALIGNMENT/Alignment_IdealCastor.dat");
   //Alignment.ReadAlignmentFile("straight");
-  Alignment.ReadAlignmentFile("ALIGNMENT/Alignment_1Telescope.dat");
-  //Alignment.ReadAlignmentFile("ALIGNMENT/Alignment_PLTMC.dat");
+  //Alignment.ReadAlignmentFile("ALIGNMENT/Alignment_1Telescope.dat");
+  Alignment.ReadAlignmentFile("ALIGNMENT/Alignment_PLTMC.dat");
 
 
   // Vector of hits for each event

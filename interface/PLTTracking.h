@@ -10,6 +10,7 @@
 #include "PLTTelescope.h"
 #include "PLTAlignment.h"
 #include "PLTU.h"
+#include "PLTMask.h"
 
 
 class PLTTracking
@@ -41,6 +42,8 @@ class PLTTracking
   private:
     PLTAlignment* fAlignment;
     TrackingAlgorithm fTrackingAlgorithm;
+    // Added Mask
+    PLTMask* fMask;
 
     static bool const DEBUG = false;
 };
