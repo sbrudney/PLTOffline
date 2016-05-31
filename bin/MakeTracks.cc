@@ -48,13 +48,16 @@ int MakeTracks (std::string const DataFileName, std::string const GainCalFileNam
   PLTEvent Event(DataFileName, GainCalFileName, AlignmentFileName, MaskFileName, IsText);
     
     
-    PLTPlane::FiducialRegion FidRegionHits  = PLTPlane::kFiducialRegion_All;
-    PLTPlane::FiducialRegion FidRegionTrack = PLTPlane::kFiducialRegion_All;
-    Event.SetPlaneFiducialRegion(FidRegionHits);
-    Event.SetPlaneClustering(PLTPlane::kClustering_AllTouching, FidRegionHits);
+  PLTPlane::FiducialRegion FidRegionHits  = PLTPlane::kFiducialRegion_All;
+  PLTPlane::FiducialRegion FidRegionTrack = PLTPlane::kFiducialRegion_All;
+  Event.SetPlaneFiducialRegion(FidRegionHits);
+  Event.SetPlaneClustering(PLTPlane::kClustering_AllTouching, FidRegionHits);
 //   }
   PLTAlignment Alignment;
   Alignment.ReadAlignmentFile(AlignmentFileName);
+  //mask here
+  PLTMask Mask;
+  Mask.ReadMaskFile(MaskFileName);
 
   std::map<int, int> NTrkEvMap;
 
@@ -125,6 +128,11 @@ int MakeTracks (std::string const DataFileName, std::string const GainCalFileNam
 
       for (size_t itrack = 0; itrack != Telescope->NTracks(); ++itrack) {
         PLTTrack* Track = Telescope->Track(itrack);
+
+	/// !!!! Write "IF statement" using variables grabbed from mask file to filter out tracks outside of active region !!!!
+	if(PLTMask::fMaskMap[0].GColStart==""){std::cout<<"DID THIS WORK I HOPE IT DID!!!!!!!!"<<std::endl;}
+
+
 
         HistBeamSpot[0]->Fill( Track->fPlaner[0][1], Track->fPlaner[0][2]);
         HistBeamSpot[1]->Fill( Track->fPlaner[1][0], Track->fPlaner[1][2]);

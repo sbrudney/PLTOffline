@@ -24,7 +24,8 @@ void PLTMask::ReadMaskFile (std::string const InFileName)
   }
 
   // Read each line in file
-  int MaskType, ROC;
+  std::string const MaskType;
+  int ROC;
   for (std::string InLine; std::getline(InFile, InLine); ) {
     if (InLine.size() < 1) {
       continue;
@@ -37,26 +38,24 @@ void PLTMask::ReadMaskFile (std::string const InFileName)
     std::istringstream LineStream;
     LineStream.str(InLine);
 
-    LineStream >>  MaskType>> ROC;
+    LineStream >>  MaskType >> ROC;
 
     std::pair<int, int> NameROC = std::make_pair(MaskType, ROC);
 
-    int ColStart, ColEnd, RowStart, RowEnd, FringeStart, FringeEnd;
+    int ColStart, ColEnd, RowStart, RowEnd;
 
     // Only ROC 0,1,2 will work
     if (ROC == 0 || ROC == 1 || ROC == 2) {
       LineStream >> ColStart 
 		 >> ColEnd 
 		 >> RowStart 
-		 >> RowEnd 
-		 >> FringeStart 
-		 >> FringeEnd;
+		 >> RowEnd;
       fMaskMap[MaskType].GColStart = ColStart;
       fMaskMap[MaskType].GColEnd = ColEnd;
       fMaskMap[MaskType].GRowStart = RowStart;
       fMaskMap[MaskType].GRowEnd = RowEnd;
-      fMaskMap[MaskType].GFringeStart = FringeStart;
-      fMaskMap[MaskType].GFringeEnd = FringeEnd;
+
+
     }
     else {
       std::cerr << "WARNING: Mask file contains things I do not recognize: " << InLine << std::endl;
@@ -81,7 +80,7 @@ void PLTMask::WriteMaskFile (std::string const OutFileName)
   }
 
   fprintf(Out, "#first line:  MaskType \n");
-  fprintf(Out, "#ColStart, ColEnd, RowStart, RowEnd, FringeStart, FringeEnd \n");
+  fprintf(Out, "#ColStart, ColEnd, RowStart, RowEnd \n");
   for (std::map<int, MaskAlignmentStruct>::iterator it = fMaskMap.begin(); it != fMaskMap.end(); ++it) {
     int const MaskType = it->first;
     MaskAlignmentStruct& Mask = it->second;
@@ -98,7 +97,7 @@ void PLTMask::WriteMaskFile (std::string const OutFileName)
 //       }
 
       
-      fprintf(Out, "%2i   %1i     %15E                       %15E    %15E    %15E    %15E    %15E\n", MaskType, iroc, Mask.GColStart, Mask.GColEnd, Mask.GRowStart, Mask.GRowEnd, Mask.GFringeStart, Mask.GFringeEnd);
+      fprintf(Out, "%2i   %1i     %15E                       %15E    %15E    %15E\n", MaskType, iroc, Mask.GColStart, Mask.GColEnd, Mask.GRowStart, Mask.GRowEnd);
 
     }
   }
