@@ -11,6 +11,7 @@
 
 #include "PLTHit.h"
 #include "PLTPlane.h"
+#include "PLTMask.h"
 
 
 
@@ -40,6 +41,9 @@ class PLTBinaryFileReader
     void SetPlaneFiducialRegion (PLTPlane::FiducialRegion);
 
     PLTPlane::FiducialRegion fPlaneFiducialRegion;
+
+    //for mask
+    //    PLTMask::MaskMap;
 
   private:
     std::string fFileName;

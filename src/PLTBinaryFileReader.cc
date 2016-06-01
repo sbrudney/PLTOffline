@@ -312,7 +312,15 @@ int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<P
     }
 
     if ( !IsPixelMasked( Channel*100000 + ROC*10000 + Col*100 + Row ) ) {
+      //mask conditions can go here
+//       if (PLTMask::fMaskMap[MaskType][(Channel,ROC)].GColStart <= Col &&
+// 	  PLTMask::fMaskMap[MaskType][(Channel,ROC)].GColEnd >= Col &&
+// 	  PLTMask::fMaskMap[MaskType][(Channel,ROC)].GRowStart <= Row &&
+// 	  PLTMask::fMaskMap[MaskType][(Channel,ROC)].GRowEnd >= Row) {
+
       PLTHit* Hit = new PLTHit(Channel, ROC, Col, Row, ADC);
+      // }
+
       // only keep hits on the diamond
       if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
         Hits.push_back(Hit);

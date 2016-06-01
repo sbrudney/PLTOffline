@@ -22,16 +22,18 @@ class PLTMask
   void ReadMaskFile (std::string const);
   void WriteMaskFile (std::string const);
   bool IsGood ();
-  bool withinBorder(std::string const, int, int, int);
+  //bool withinBorder(std::string, int, int, int);
 
   // Mini Structure only used in reading Mask file
   struct MaskAlignmentStruct {
-    float GColStart, GColEnd, GRowStart, GRowEnd;
+    int GColStart, GColEnd, GRowStart, GRowEnd;
   };
   
   //std::map<std::string const, std::map<pair(int, int)> fMaskMap;
   //std::
-  std::map<std::string const, std::map< std::pair<std::string const,int>, MaskAlignmentStruct > > fMaskMap;
+
+  // map <MaskType, map < pair< Channel, ROC >, MaskALignmentStruct> > fMaskMap;
+  std::map<std::string, std::map< std::pair<int, int>, MaskAlignmentStruct > > fMaskMap;
 
 
  private:

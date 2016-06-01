@@ -116,7 +116,7 @@ class PLTEvent : public PLTTracking
     std::map<int, PLTTelescope> fTelescopeMap;
     std::map<std::pair<int, int>, PLTPlane> fPlaneMap;
     // mask
-    std::map<int,PLTMask> fMaskMap;
+    std::map<int, PLTMask> fMaskMap;
 
 };
 

@@ -55,9 +55,12 @@ int MakeTracks (std::string const DataFileName, std::string const GainCalFileNam
 //   }
   PLTAlignment Alignment;
   Alignment.ReadAlignmentFile(AlignmentFileName);
+
   //mask here
-  PLTMask Mask;
-  Mask.ReadMaskFile(MaskFileName);
+  if (MaskFileName != "blank") {
+    PLTMask Mask;
+    Mask.ReadMaskFile(MaskFileName);
+  }
 
   std::map<int, int> NTrkEvMap;
 
@@ -130,7 +133,7 @@ int MakeTracks (std::string const DataFileName, std::string const GainCalFileNam
         PLTTrack* Track = Telescope->Track(itrack);
 
 	/// !!!! Write "IF statement" using variables grabbed from mask file to filter out tracks outside of active region !!!!
-	if(PLTMask::fMaskMap[0].GColStart==""){std::cout<<"DID THIS WORK I HOPE IT DID!!!!!!!!"<<std::endl;}
+	//if(PLTMask::fMaskMap[0].GColStart==""){std::cout<<"DID THIS WORK I HOPE IT DID!!!!!!!!"<<std::endl;}
 
 
 

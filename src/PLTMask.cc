@@ -24,8 +24,8 @@ void PLTMask::ReadMaskFile (std::string const InFileName)
   }
 
   // Read each line in file
-  std::string const MaskType;
-  int ROC;
+  std::string MaskType;
+  int Channel, ROC;
   for (std::string InLine; std::getline(InFile, InLine); ) {
     if (InLine.size() < 1) {
       continue;
@@ -38,9 +38,11 @@ void PLTMask::ReadMaskFile (std::string const InFileName)
     std::istringstream LineStream;
     LineStream.str(InLine);
 
-    LineStream >>  MaskType >> ROC;
+    LineStream >> MaskType >> Channel  >> ROC;
 
-    std::pair<int, int> NameROC = std::make_pair(MaskType, ROC);
+    std::cout<<"Mask type is: "<<MaskType<<std::endl;
+
+    std::pair<int, int> CHROC = std::make_pair(Channel, ROC);
 
     int ColStart, ColEnd, RowStart, RowEnd;
 
@@ -50,12 +52,10 @@ void PLTMask::ReadMaskFile (std::string const InFileName)
 		 >> ColEnd 
 		 >> RowStart 
 		 >> RowEnd;
-      fMaskMap[MaskType].GColStart = ColStart;
-      fMaskMap[MaskType].GColEnd = ColEnd;
-      fMaskMap[MaskType].GRowStart = RowStart;
-      fMaskMap[MaskType].GRowEnd = RowEnd;
-
-
+      PLTMask::MaskAlignmentStruct MAS = { ColStart, ColEnd, RowStart, RowEnd };
+      // save values in map
+      fMaskMap[MaskType][CHROC]= MAS;
+      std::cout<<MaskType<<" "<<Channel<<" "<<ROC<<" "<<ColStart<<std::endl;
     }
     else {
       std::cerr << "WARNING: Mask file contains things I do not recognize: " << InLine << std::endl;
@@ -70,45 +70,48 @@ void PLTMask::ReadMaskFile (std::string const InFileName)
 }
 
 
-void PLTMask::WriteMaskFile (std::string const OutFileName)
-{
-  //Open output file
-  FILE* Out = fopen(OutFileName.c_str(), "w");
-  if (!Out) {
-    std::cerr << "ERROR: cannot open file: " << OutFileName << std::endl;
-    throw;
-  }
+//// Not sure if a write file is necessary
 
-  fprintf(Out, "#first line:  MaskType \n");
-  fprintf(Out, "#ColStart, ColEnd, RowStart, RowEnd \n");
-  for (std::map<int, MaskAlignmentStruct>::iterator it = fMaskMap.begin(); it != fMaskMap.end(); ++it) {
-    int const MaskType = it->first;
-    MaskAlignmentStruct& Mask = it->second;
-    fprintf(Out, "\n");
-    fprintf(Out, "%2i\n", MaskType);
+// void PLTMask::WriteMaskFile (std::string const OutFileName)
+// {
+//   //Open output file
+//   FILE* Out = fopen(OutFileName.c_str(), "w");
+//   if (!Out) {
+//     std::cerr << "ERROR: cannot open file: " << OutFileName << std::endl;
+//     throw;
+//   }
+
+//   fprintf(Out, "#first line:  MaskType \n");
+//   fprintf(Out, "#ColStart, ColEnd, RowStart, RowEnd \n");
+//   for (std::map<int, MaskAlignmentStruct>::iterator it = fMaskMap.begin(); it != fMaskMap.end(); ++it) {
+//     int const MaskType = it->first;
+//     MaskAlignmentStruct& Mask = it->second;
+//     fprintf(Out, "\n");
+//     fprintf(Out, "%2i\n", MaskType);
 
 
-    for (int iroc = 0; iroc !=3; ++iroc) {
-      std::pair<int, int> Nameiroc = std::make_pair(MaskType, iroc);
+//     for (int iroc = 0; iroc !=3; ++iroc) {
+//       std::pair<int, int> Nameiroc = std::make_pair(MaskType, iroc);
 
-//       if (!fMaskMap.count(Nameiroc)) {
-// 	std::cerr << "ERROR: No entry in fMaskMap for Name iroc: " << MaskType << " " << iroc << std::endl;
-// 	continue;
-//       }
+// //       if (!fMaskMap.count(Nameiroc)) {
+// // 	std::cerr << "ERROR: No entry in fMaskMap for Name iroc: " << MaskType << " " << iroc << std::endl;
+// // 	continue;
+// //       }
 
       
-      fprintf(Out, "%2i   %1i     %15E                       %15E    %15E    %15E\n", MaskType, iroc, Mask.GColStart, Mask.GColEnd, Mask.GRowStart, Mask.GRowEnd);
+//       fprintf(Out, "%2i   %1i     %15E                       %15E    %15E    %15E\n", MaskType, iroc, Mask.GColStart, Mask.GColEnd, Mask.GRowStart, Mask.GRowEnd);
 
-    }
-  }
-  fprintf(Out, "\n");
+//     }
+//   }
+//   fprintf(Out, "\n");
 
-  fclose(Out);
+//   fclose(Out);
 
-  return;
-}
+//   return;
+// }
 
 bool PLTMask::IsGood ()
 {
   return fIsGood;
 }
+
