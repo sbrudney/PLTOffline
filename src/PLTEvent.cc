@@ -51,8 +51,9 @@ PLTEvent::PLTEvent (std::string const DataFileName, std::string const GainCalFil
   fGainCal.ReadGainCalFile(GainCalFileName);
   fAlignment.ReadAlignmentFile(AlignmentFileName);
   if (MaskFileName != "blank"){
-    //fMask.ReadMaskFile(MaskFileName);
+    fMask.ReadMaskFile(MaskFileName);
   }
+
   SetDefaults();
 
   SetTrackingAlignment(&fAlignment);

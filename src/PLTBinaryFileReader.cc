@@ -10,7 +10,7 @@ PLTBinaryFileReader::PLTBinaryFileReader ()
 }
 
 
-PLTBinaryFileReader::PLTBinaryFileReader (std::string const in, bool IsText)
+PLTBinaryFileReader::PLTBinaryFileReader (std::string const in, bool IsText, std::string const MaskFileName)
 {
   SetIsText(IsText);
 
@@ -312,21 +312,35 @@ int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<P
     }
 
     if ( !IsPixelMasked( Channel*100000 + ROC*10000 + Col*100 + Row ) ) {
-      //mask conditions can go here
-//       if (PLTMask::fMaskMap[MaskType][(Channel,ROC)].GColStart <= Col &&
-// 	  PLTMask::fMaskMap[MaskType][(Channel,ROC)].GColEnd >= Col &&
-// 	  PLTMask::fMaskMap[MaskType][(Channel,ROC)].GRowStart <= Row &&
-// 	  PLTMask::fMaskMap[MaskType][(Channel,ROC)].GRowEnd >= Row) {
-
       PLTHit* Hit = new PLTHit(Channel, ROC, Col, Row, ADC);
-      // }
-
-      // only keep hits on the diamond
-      if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
-        Hits.push_back(Hit);
-	//	std::cout << "Hit: " << Channel << ":" << ROC << ":" << Col << ":" << Row << ":" << ADC << std::endl;
-      } else {
-        delete Hit;
+      //mask conditions can go here
+      if (MaskFileName != "blank"){
+	fMask.ReadMaskFile(MaskFileName);
+	std::string Masktype = fMask.begin()->first;
+	if (fMask[Masktype][(Channel,ROC)].GColStart <= Col &&
+	    fMask[Masktype][(Channel,ROC)].GColEnd >= Col &&
+	    fMask[Masktype][(Channel,ROC)].GRowStart <= Row &&
+	    fMask[Masktype][(Channel,ROC)].GRowEnd >= Row) {
+	  //true){
+	  
+	  
+	  // only keep hits on the diamond
+	  if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
+	    Hits.push_back(Hit);
+	    //	std::cout << "Hit: " << Channel << ":" << ROC << ":" << Col << ":" << Row << ":" << ADC << std::endl;
+	  } else {
+	    delete Hit;
+	  }
+	}
+      }
+      else {
+	// only keep hits on the diamond
+	if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
+	  Hits.push_back(Hit);
+	  //	std::cout << "Hit: " << Channel << ":" << ROC << ":" << Col << ":" << Row << ":" << ADC << std::endl;
+	} else {
+	  delete Hit;
+	}
       }
       //printf("%2i %2i %2i %2i %5i %9i\n", Channel, ROC, Col, Row, ADC, EventNumber);
     }

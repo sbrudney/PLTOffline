@@ -12,6 +12,7 @@
 #include "PLTHit.h"
 #include "PLTPlane.h"
 #include "PLTMask.h"
+#include "PLTEvent.h"
 
 
 
@@ -19,7 +20,7 @@ class PLTBinaryFileReader
 {
   public:
     PLTBinaryFileReader ();
-    PLTBinaryFileReader (std::string const, bool const IsText = false);
+    PLTBinaryFileReader (std::string const, bool const IsText = false, std::string const MaskFileName = "blank");
     ~PLTBinaryFileReader ();
 
     bool Open (std::string const);
@@ -43,7 +44,7 @@ class PLTBinaryFileReader
     PLTPlane::FiducialRegion fPlaneFiducialRegion;
 
     //for mask
-    //    PLTMask::MaskMap;
+    PLTMask fMask;
 
   private:
     std::string fFileName;
