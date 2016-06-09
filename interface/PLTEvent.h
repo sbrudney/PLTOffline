@@ -97,7 +97,6 @@ class PLTEvent : public PLTTracking
       return fGainCal.GetHardwareID(ch);
     }
 
-
   private:
     unsigned long fRun;
     unsigned long fRunSection;

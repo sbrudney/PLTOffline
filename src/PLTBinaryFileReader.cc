@@ -15,7 +15,7 @@ PLTBinaryFileReader::PLTBinaryFileReader (std::string const in, bool IsText, std
   SetIsText(IsText);
 
   if (fIsText) {
-    OpenTextFile(in);
+    OpenTextFile(in, MaskFileName);
   } else {
     Open(in);
   }
@@ -31,10 +31,10 @@ PLTBinaryFileReader::~PLTBinaryFileReader ()
 
 
 
-bool PLTBinaryFileReader::Open (std::string const DataFileName)
+bool PLTBinaryFileReader::Open (std::string const DataFileName, std::string const MaskFileName = "blank")
 {
   if (fIsText) {
-    return OpenTextFile(DataFileName);
+    return OpenTextFile(DataFileName, MaskFileName);
   } else {
     return OpenBinary(DataFileName);
   }
@@ -56,7 +56,7 @@ bool PLTBinaryFileReader::OpenBinary (std::string const DataFileName)
 
 
 
-bool PLTBinaryFileReader::OpenTextFile (std::string const DataFileName)
+bool PLTBinaryFileReader::OpenTextFile (std::string const DataFileName, std::string const MaskFileName)
 {
   fFileName = DataFileName;
   fInfile.open(fFileName.c_str());
@@ -151,10 +151,10 @@ bool PLTBinaryFileReader::DecodeSpyDataFifo (uint32_t word, std::vector<PLTHit*>
 }
 
 
-int PLTBinaryFileReader::ReadEventHits (std::vector<PLTHit*>& Hits, unsigned long& Event, uint32_t& Time, uint32_t& BX)
+int PLTBinaryFileReader::ReadEventHits (std::vector<PLTHit*>& Hits, unsigned long& Event, uint32_t& Time, uint32_t& BX, std::string const MaskFileName)
 {
   if (fIsText) {
-    return ReadEventHitsText(fInfile, Hits, Event, Time, BX);
+    return ReadEventHitsText(fInfile, Hits, Event, Time, BX, MaskFileName);
   } else {
     return ReadEventHits(fInfile, Hits, Event, Time, BX);
   }
@@ -279,7 +279,7 @@ int PLTBinaryFileReader::ReadEventHits (std::ifstream& InFile, std::vector<PLTHi
 
 
 
-int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<PLTHit*>& Hits, unsigned long& Event, uint32_t& Time, uint32_t& BX, std::string const MaskFileName = "blank")
+int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<PLTHit*>& Hits, unsigned long& Event, uint32_t& Time, uint32_t& BX, std::string const MaskFileName)
 {
   int LastEventNumber = -1;
   int EventNumber = -1;
@@ -314,33 +314,33 @@ int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<P
     if ( !IsPixelMasked( Channel*100000 + ROC*10000 + Col*100 + Row ) ) {
       PLTHit* Hit = new PLTHit(Channel, ROC, Col, Row, ADC);
       //mask conditions can go here
-      if (MaskFileName != "blank"){
-	fMask.ReadMaskFile(MaskFileName);
-	std::string Masktype = fMask.begin()->first;
-	if (fMask[Masktype][(Channel,ROC)].GColStart <= Col &&
-	    fMask[Masktype][(Channel,ROC)].GColEnd >= Col &&
-	    fMask[Masktype][(Channel,ROC)].GRowStart <= Row &&
-	    fMask[Masktype][(Channel,ROC)].GRowEnd >= Row) {
-	  //true){
+//       if (MaskFileName != "blank"){
+// 	fMask.ReadMaskFile(MaskFileName);
+// 	std::string Masktype = fMask.begin()->first;
+// 	if (fMask[Masktype][(Channel,ROC)].GColStart <= Col &&
+// 	    fMask[Masktype][(Channel,ROC)].GColEnd >= Col &&
+// 	    fMask[Masktype][(Channel,ROC)].GRowStart <= Row &&
+// 	    fMask[Masktype][(Channel,ROC)].GRowEnd >= Row) {
+// 	  //true){
 	  
 	  
-	  // only keep hits on the diamond
-	  if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
-	    Hits.push_back(Hit);
-	    //	std::cout << "Hit: " << Channel << ":" << ROC << ":" << Col << ":" << Row << ":" << ADC << std::endl;
-	  } else {
-	    delete Hit;
-	  }
-	}
-      }
-      else {
+// 	  // only keep hits on the diamond
+// 	  if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
+// 	    Hits.push_back(Hit);
+// 	    //	std::cout << "Hit: " << Channel << ":" << ROC << ":" << Col << ":" << Row << ":" << ADC << std::endl;
+// 	  } else {
+// 	    delete Hit;
+// 	  }
+// 	}
+//       }
+//       else {
 	// only keep hits on the diamond
 	if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
 	  Hits.push_back(Hit);
 	  //	std::cout << "Hit: " << Channel << ":" << ROC << ":" << Col << ":" << Row << ":" << ADC << std::endl;
 	} else {
 	  delete Hit;
-	}
+	  //	}
       }
       //printf("%2i %2i %2i %2i %5i %9i\n", Channel, ROC, Col, Row, ADC, EventNumber);
     }

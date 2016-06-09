@@ -47,12 +47,12 @@ PLTEvent::PLTEvent (std::string const DataFileName, std::string const GainCalFil
 {
   // Constructor, which will also give you access to the gaincal values
   fBinFile.SetIsText(IsText);
-  fBinFile.Open(DataFileName);
+  fBinFile.Open(DataFileName, MaskFileName);
   fGainCal.ReadGainCalFile(GainCalFileName);
   fAlignment.ReadAlignmentFile(AlignmentFileName);
-  if (MaskFileName != "blank"){
-    fMask.ReadMaskFile(MaskFileName);
-  }
+//   if (MaskFileName != "blank"){
+//     fMask.ReadMaskFile(MaskFileName);
+//   }
 
   SetDefaults();
 
@@ -271,13 +271,13 @@ void PLTEvent::SetPlaneClustering (PLTPlane::Clustering in, PLTPlane::FiducialRe
 }
 
 
-int PLTEvent::GetNextEvent ()
+int PLTEvent::GetNextEvent (std::string const MaskFileName)
 {
   // First clear the event
   Clear();
 
   // The number we'll return.. number of hits, or -1 for end
-  int ret = fBinFile.ReadEventHits(fHits, fEvent, fTime, fBX);
+  int ret = fBinFile.ReadEventHits(fHits, fEvent, fTime, fBX, MaskFileName);
   if (ret < 0) {
     return ret;
   }
