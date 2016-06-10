@@ -12,7 +12,7 @@
 #include "PLTHit.h"
 #include "PLTPlane.h"
 #include "PLTMask.h"
-#include "PLTEvent.h"
+//#include "PLTEvent.h"
 
 
 
@@ -23,11 +23,11 @@ class PLTBinaryFileReader
     PLTBinaryFileReader (std::string const, bool const IsText = false, std::string const MaskFileName = "blank");
     ~PLTBinaryFileReader ();
 
-    bool Open (std::string const);
-    bool Open (std::string const, std::string const);
+    //    bool Open (std::string const);
+    bool Open (std::string const, std::string const MaskFileName = "blank");
     bool OpenBinary (std::string const);
-    bool OpenTextFile (std::string const);
-    bool OpenTextFile (std::string const, std::string const);
+    //    bool OpenTextFile (std::string const);
+    bool OpenTextFile (std::string const, std::string const MaskFileName = "blank");
     void SetIsText (bool const);
 
 

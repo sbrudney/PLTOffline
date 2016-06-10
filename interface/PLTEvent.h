@@ -57,7 +57,7 @@ class PLTEvent : public PLTTracking
       return fHits.size();
     }
 
-    int GetNextEvent ();
+    int GetNextEvent (std::string const MaskFileName = "");
 
     PLTGainCal* GetGainCal ()
     {

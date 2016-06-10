@@ -31,7 +31,7 @@ PLTBinaryFileReader::~PLTBinaryFileReader ()
 
 
 
-bool PLTBinaryFileReader::Open (std::string const DataFileName, std::string const MaskFileName = "blank")
+bool PLTBinaryFileReader::Open (std::string const DataFileName, std::string const MaskFileName)
 {
   if (fIsText) {
     return OpenTextFile(DataFileName, MaskFileName);
