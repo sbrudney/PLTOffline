@@ -314,43 +314,46 @@ int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<P
     if ( !IsPixelMasked( Channel*100000 + ROC*10000 + Col*100 + Row ) ) {
       PLTHit* Hit = new PLTHit(Channel, ROC, Col, Row, ADC);
       //mask conditions can go here
-//       if (MaskFileName != "blank"){
-// 	fMask.ReadMaskFile(MaskFileName);
-// 	std::string Masktype = fMask.begin()->first;
-// 	if (fMask[Masktype][(Channel,ROC)].GColStart <= Col &&
-// 	    fMask[Masktype][(Channel,ROC)].GColEnd >= Col &&
-// 	    fMask[Masktype][(Channel,ROC)].GRowStart <= Row &&
-// 	    fMask[Masktype][(Channel,ROC)].GRowEnd >= Row) {
-// 	  //true){
-	  
-	  
-// 	  // only keep hits on the diamond
-// 	  if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
-// 	    Hits.push_back(Hit);
-// 	    //	std::cout << "Hit: " << Channel << ":" << ROC << ":" << Col << ":" << Row << ":" << ADC << std::endl;
-// 	  } else {
-// 	    delete Hit;
-// 	  }
-// 	}
-//       }
-//       else {
+      if (MaskFileName != "blank"){
+	PLTMask fMask;
+	fMask.ReadMaskFile(MaskFileName);
+	//std::string Masktype = fMask.fMaskMap.begin()->first;
+	//// make above line into function
+	std::string MaskType = PLTMask::GetMaskType(MaskFileName);
+	//	std::cout<<"Mask Type: "<<MaskType<<std::endl;
+	//// fix notation below
+	if (fMask[MaskType][(Channel,ROC)].GColStart <= Col){// &&
+// 	    fMask[MaskType][(Channel,ROC)].GColEnd >= Col &&
+// 	    fMask[MaskType][(Channel,ROC)].GRowStart <= Row &&
+// 	    fMask[MaskType][(Channel,ROC)].GRowEnd >= Row) {
+  
+	  // only keep hits on the diamond
+	  if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
+	    Hits.push_back(Hit);
+	    //	std::cout << "Hit: " << Channel << ":" << ROC << ":" << Col << ":" << Row << ":" << ADC << std::endl;
+	  } else {
+	    delete Hit;
+	  }
+	}
+      }
+      else {
 	// only keep hits on the diamond
 	if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
 	  Hits.push_back(Hit);
 	  //	std::cout << "Hit: " << Channel << ":" << ROC << ":" << Col << ":" << Row << ":" << ADC << std::endl;
 	} else {
 	  delete Hit;
-	  //	}
+	}
       }
       //printf("%2i %2i %2i %2i %5i %9i\n", Channel, ROC, Col, Row, ADC, EventNumber);
     }
-
+    
     LastEventNumber = EventNumber;
     Event = EventNumber;
-
+    
   }
   
-
+  
   return Hits.size();
 }
 
@@ -359,7 +362,7 @@ int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<P
 void PLTBinaryFileReader::ReadPixelMask (std::string const InFileName)
 {
   std::cout << "PLTBinaryFileReader::ReadPixelMask reading file: " << InFileName << std::endl;
-
+  
   std::ifstream InFile(InFileName.c_str());
   if (!InFile.is_open()) {
     std::cerr << "ERROR: cannot open PixelMask file: " << InFileName << std::endl;

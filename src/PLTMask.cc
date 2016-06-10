@@ -69,46 +69,12 @@ void PLTMask::ReadMaskFile (std::string const InFileName)
   
 }
 
-
-//// Not sure if a write file is necessary
-
-// void PLTMask::WriteMaskFile (std::string const OutFileName)
-// {
-//   //Open output file
-//   FILE* Out = fopen(OutFileName.c_str(), "w");
-//   if (!Out) {
-//     std::cerr << "ERROR: cannot open file: " << OutFileName << std::endl;
-//     throw;
-//   }
-
-//   fprintf(Out, "#first line:  MaskType \n");
-//   fprintf(Out, "#ColStart, ColEnd, RowStart, RowEnd \n");
-//   for (std::map<int, MaskAlignmentStruct>::iterator it = fMaskMap.begin(); it != fMaskMap.end(); ++it) {
-//     int const MaskType = it->first;
-//     MaskAlignmentStruct& Mask = it->second;
-//     fprintf(Out, "\n");
-//     fprintf(Out, "%2i\n", MaskType);
-
-
-//     for (int iroc = 0; iroc !=3; ++iroc) {
-//       std::pair<int, int> Nameiroc = std::make_pair(MaskType, iroc);
-
-// //       if (!fMaskMap.count(Nameiroc)) {
-// // 	std::cerr << "ERROR: No entry in fMaskMap for Name iroc: " << MaskType << " " << iroc << std::endl;
-// // 	continue;
-// //       }
-
-      
-//       fprintf(Out, "%2i   %1i     %15E                       %15E    %15E    %15E\n", MaskType, iroc, Mask.GColStart, Mask.GColEnd, Mask.GRowStart, Mask.GRowEnd);
-
-//     }
-//   }
-//   fprintf(Out, "\n");
-
-//   fclose(Out);
-
-//   return;
-// }
+std::string GetMaskType(std::string const MaskFileName)
+{
+  fMask.ReadMaskFile(MaskFileName);
+  std::string MaskType = fMask.fMaskMap.begin->first();
+  return MaskType;
+}
 
 bool PLTMask::IsGood ()
 {
