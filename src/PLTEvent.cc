@@ -35,13 +35,30 @@ PLTEvent::PLTEvent (std::string const DataFileName, std::string const GainCalFil
   fBinFile.Open(DataFileName);
   fGainCal.ReadGainCalFile(GainCalFileName);
   fAlignment.ReadAlignmentFile(AlignmentFileName);
-  
+
   SetDefaults();
 
   SetTrackingAlignment(&fAlignment);
   SetTrackingAlgorithm(PLTTracking::kTrackingAlgorithm_01to2_All);
 }
 
+
+PLTEvent::PLTEvent (std::string const DataFileName, std::string const GainCalFileName, std::string const AlignmentFileName, std::string const MaskFileName, bool const IsText) 
+{
+  // Constructor, which will also give you access to the gaincal values
+  fBinFile.SetIsText(IsText);
+  fBinFile.Open(DataFileName, MaskFileName);
+  fGainCal.ReadGainCalFile(GainCalFileName);
+  fAlignment.ReadAlignmentFile(AlignmentFileName);
+//   if (MaskFileName != "blank"){
+//     fMask.ReadMaskFile(MaskFileName);
+//   }
+
+  SetDefaults();
+
+  SetTrackingAlignment(&fAlignment);
+  SetTrackingAlgorithm(PLTTracking::kTrackingAlgorithm_01to2_All);
+}
 
 PLTEvent::~PLTEvent ()
 {
@@ -76,7 +93,10 @@ PLTAlignment* PLTEvent::GetAlignment ()
   return &fAlignment;
 }
 
-
+PLTMask* PLTEvent::GetMask ()
+{
+  return &fMask;
+}
 
 
 size_t PLTEvent::NPlanes ()
@@ -251,13 +271,13 @@ void PLTEvent::SetPlaneClustering (PLTPlane::Clustering in, PLTPlane::FiducialRe
 }
 
 
-int PLTEvent::GetNextEvent ()
+int PLTEvent::GetNextEvent (std::string const MaskFileName)
 {
   // First clear the event
   Clear();
 
   // The number we'll return.. number of hits, or -1 for end
-  int ret = fBinFile.ReadEventHits(fHits, fEvent, fTime, fBX);
+  int ret = fBinFile.ReadEventHits(fHits, fEvent, fTime, fBX, MaskFileName);
   if (ret < 0) {
     return ret;
   }

@@ -18,31 +18,49 @@
 
 
 // FUNCTION DEFINITIONS HERE
-int MakeTracks (std::string const, std::string const, std::string const,bool);
+int MakeTracks (std::string const, std::string const, std::string const, bool, std::string const);
 
 
 
 
-int MakeTracks (std::string const DataFileName, std::string const GainCalFileName, std::string const AlignmentFileName, bool IsText)
+int MakeTracks (std::string const DataFileName, std::string const GainCalFileName, std::string const AlignmentFileName, bool IsText, std::string const MaskFileName)
 {
   std::cout << "DataFileName:      " << DataFileName << std::endl;
   std::cout << "GainCalFileName:   " << GainCalFileName << std::endl;
   std::cout << "AlignmentFileName: " << AlignmentFileName << std::endl;
+  std::cout << "MaskFileName:      " << MaskFileName << std::endl;
 
   // Set some basic style for plots
   PLTU::SetStyle();
   gStyle->SetOptStat(1111);
 
   // Grab the plt event reader
-  PLTEvent Event(DataFileName, GainCalFileName, AlignmentFileName,IsText);
-
+  //  PLTEvent Event(DataFileName, GainCalFileName, AlignmentFileName, IsText);
+  //PLTEvent Event;
+  //  if (MaskFileName != "blank") {
+//     PLTEvent Event(DataFileName, GainCalFileName, AlignmentFileName, MaskFileName, IsText);
+//     PLTPlane::FiducialRegion FidRegionHits  = PLTPlane::kFiducialRegion_All;
+//     PLTPlane::FiducialRegion FidRegionTrack = PLTPlane::kFiducialRegion_All;
+//     Event.SetPlaneFiducialRegion(FidRegionHits);
+//     Event.SetPlaneClustering(PLTPlane::kClustering_AllTouching, FidRegionHits);
+//   }
+//   else {
+  PLTEvent Event(DataFileName, GainCalFileName, AlignmentFileName, MaskFileName, IsText);
+    
+    
   PLTPlane::FiducialRegion FidRegionHits  = PLTPlane::kFiducialRegion_All;
   PLTPlane::FiducialRegion FidRegionTrack = PLTPlane::kFiducialRegion_All;
   Event.SetPlaneFiducialRegion(FidRegionHits);
   Event.SetPlaneClustering(PLTPlane::kClustering_AllTouching, FidRegionHits);
-
+//   }
   PLTAlignment Alignment;
   Alignment.ReadAlignmentFile(AlignmentFileName);
+
+  //mask here
+//   if (MaskFileName != "blank") {
+//     PLTMask Mask;
+//     Mask.ReadMaskFile(MaskFileName);
+//   }
 
   std::map<int, int> NTrkEvMap;
 
@@ -59,7 +77,7 @@ int MakeTracks (std::string const DataFileName, std::string const GainCalFileNam
   std::map<int, TH1F*> MapResidualX;
 
   // Loop over all events in file
-  for (int ientry = 0; Event.GetNextEvent() >= 0; ++ientry) {
+  for (int ientry = 0; Event.GetNextEvent(MaskFileName) >= 0; ++ientry) {
     if (ientry % 10000 == 0) {
 //      std::cout << "Processing entry: " << ientry << std::endl;
     }
@@ -113,6 +131,11 @@ int MakeTracks (std::string const DataFileName, std::string const GainCalFileNam
 
       for (size_t itrack = 0; itrack != Telescope->NTracks(); ++itrack) {
         PLTTrack* Track = Telescope->Track(itrack);
+
+	/// !!!! Write "IF statement" using variables grabbed from mask file to filter out tracks outside of active region !!!!
+	//if(PLTMask::fMaskMap[0].GColStart==""){std::cout<<"DID THIS WORK I HOPE IT DID!!!!!!!!"<<std::endl;}
+
+
 
         HistBeamSpot[0]->Fill( Track->fPlaner[0][1], Track->fPlaner[0][2]);
         HistBeamSpot[1]->Fill( Track->fPlaner[1][0], Track->fPlaner[1][2]);
@@ -228,29 +251,32 @@ int MakeTracks (std::string const DataFileName, std::string const GainCalFileNam
 
 int main (int argc, char* argv[])
 {
-  if (argc != 4) {
-    std::cerr << "Usage: " << argv[0] << " [DataFile.dat] [GainCal.dat] [AlignmentFile.dat]" << std::endl;
+  if (argc != 5) {
+    std::cerr << "Usage: " << argv[0] << " [DataFile.dat] [GainCal.dat] [AlignmentFile.dat] [MaskFile.txt](optional, blank if no mask file)" << std::endl;
     return 1;
   }
 
   std::string const DataFileName = argv[1];
   std::string const GainCalFileName = argv[2];
   std::string const AlignmentFileName = argv[3];
+  std::string const MaskFileName = argv[4];
+
+  //  if (argv[4] == "none"){
 
   if(DataFileName.substr(DataFileName.find_last_of(".")+1) == "dat")
     {
-      MakeTracks(DataFileName, GainCalFileName, AlignmentFileName,false);
+      MakeTracks(DataFileName, GainCalFileName, AlignmentFileName, false, MaskFileName);
     }
   else if(DataFileName.substr(DataFileName.find_last_of(".")+1) == "txt")
     {
-      MakeTracks(DataFileName, GainCalFileName, AlignmentFileName,true);
+      MakeTracks(DataFileName, GainCalFileName, AlignmentFileName, true, MaskFileName);
     }
   else
     {
     std::cerr << "Usage: please make sure the provided datafile ends on .dat or .txt" << std::endl;
     return 1;
     }
-
+  //  }
 
   return 0;
 }

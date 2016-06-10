@@ -6,6 +6,7 @@
 #include "PLTGainCal.h"
 #include "PLTAlignment.h"
 #include "PLTTracking.h"
+#include "PLTMask.h"
 
 
 #include <map>
@@ -18,6 +19,8 @@ class PLTEvent : public PLTTracking
     PLTEvent (std::string const, bool const IsText = false);
     PLTEvent (std::string const, std::string const, bool const IsText = false);
     PLTEvent (std::string const, std::string const, std::string const, bool const IsText = false);
+    //Adding a mask
+    PLTEvent (std::string const, std::string const, std::string const, std::string const, bool const IsText = false);
     ~PLTEvent ();
 
 
@@ -33,6 +36,7 @@ class PLTEvent : public PLTTracking
     size_t NTelescopes ();
     PLTTelescope* Telescope (size_t);
 
+
     void Clear ();
     void AddHit (PLTHit&);
     void AddHit (PLTHit*);
@@ -42,6 +46,7 @@ class PLTEvent : public PLTTracking
     void SetPlaneClustering (PLTPlane::Clustering, PLTPlane::FiducialRegion);
 
     PLTAlignment* GetAlignment ();
+    PLTMask* GetMask ();
 
     unsigned long EventNumber ()
     { 
@@ -92,7 +97,6 @@ class PLTEvent : public PLTTracking
       return fGainCal.GetHardwareID(ch);
     }
 
-
   private:
     unsigned long fRun;
     unsigned long fRunSection;
@@ -103,12 +107,15 @@ class PLTEvent : public PLTTracking
     PLTGainCal fGainCal;
     PLTBinaryFileReader fBinFile;
     PLTAlignment fAlignment;
+    PLTMask fMask;
 
     PLTPlane::Clustering fClustering;
     PLTPlane::FiducialRegion fFiducial;
 
     std::map<int, PLTTelescope> fTelescopeMap;
     std::map<std::pair<int, int>, PLTPlane> fPlaneMap;
+    // mask
+    std::map<int, PLTMask> fMaskMap;
 
 };
 
