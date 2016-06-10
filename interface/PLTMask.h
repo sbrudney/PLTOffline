@@ -35,7 +35,7 @@ class PLTMask
   // map <MaskType, map < pair< Channel, ROC >, MaskALignmentStruct> > fMaskMap;
   std::map<std::string, std::map< std::pair<int, int>, MaskAlignmentStruct > > fMaskMap;
 
-  static std::string GetMaskType(std::string const);
+
 
  private:
  

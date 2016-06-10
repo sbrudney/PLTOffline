@@ -69,12 +69,7 @@ void PLTMask::ReadMaskFile (std::string const InFileName)
   
 }
 
-std::string GetMaskType(std::string const MaskFileName)
-{
-  fMask.ReadMaskFile(MaskFileName);
-  std::string MaskType = fMask.fMaskMap.begin->first();
-  return MaskType;
-}
+
 
 bool PLTMask::IsGood ()
 {

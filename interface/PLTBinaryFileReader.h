@@ -48,6 +48,8 @@ class PLTBinaryFileReader
     //for mask
     PLTMask fMask;
 
+    static std::string GetMaskType(std::string const);
+
   private:
     std::string fFileName;
     std::ifstream fInfile;
@@ -55,6 +57,8 @@ class PLTBinaryFileReader
     uint32_t fLastTime;
     int fTimeMult;
     int fFEDID;
+    
+    
 
     std::set<int> fPixelMask;
 };

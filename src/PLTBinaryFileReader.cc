@@ -315,17 +315,17 @@ int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<P
       PLTHit* Hit = new PLTHit(Channel, ROC, Col, Row, ADC);
       //mask conditions can go here
       if (MaskFileName != "blank"){
-	PLTMask fMask;
+	std::pair<int,int> CHROC = std::make_pair(Channel, ROC);	
 	fMask.ReadMaskFile(MaskFileName);
 	//std::string Masktype = fMask.fMaskMap.begin()->first;
 	//// make above line into function
-	std::string MaskType = PLTMask::GetMaskType(MaskFileName);
+	std::string MaskType = GetMaskType(MaskFileName);
 	//	std::cout<<"Mask Type: "<<MaskType<<std::endl;
 	//// fix notation below
-	if (fMask[MaskType][(Channel,ROC)].GColStart <= Col){// &&
-// 	    fMask[MaskType][(Channel,ROC)].GColEnd >= Col &&
-// 	    fMask[MaskType][(Channel,ROC)].GRowStart <= Row &&
-// 	    fMask[MaskType][(Channel,ROC)].GRowEnd >= Row) {
+	if (fMask.fMaskMap[MaskType][CHROC].GColStart <= Col){// &&
+// 	    fMask[MaskType][CHROC].GColEnd >= Col &&
+// 	    fMask[MaskType][CHROC].GRowStart <= Row &&
+// 	    fMask[MaskType][CHROC].GRowEnd >= Row) {
   
 	  // only keep hits on the diamond
 	  if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
@@ -357,7 +357,13 @@ int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<P
   return Hits.size();
 }
 
-
+std::string GetMaskType(std::string const MaskFileName)
+{
+  
+  fMask.ReadMaskFile(MaskFileName);
+  std::string MaskType = fMaskMap.begin->first();
+  return "blank";
+}
 
 void PLTBinaryFileReader::ReadPixelMask (std::string const InFileName)
 {
