@@ -74,15 +74,16 @@ TH1F* FidHistFrom2D (TH2F* hIN, TString const NewName, int const NBins, PLTPlane
 
 // CODE BELOW
 
-int OccupancyPlots (std::string const DataFileName, bool IsText)
+int OccupancyPlots (std::string const DataFileName,std::string const MaskFileName, bool IsText)
 {
   // Set some basic style
   PLTU::SetStyle();
 
   std::cout << "DataFileName:    " << DataFileName << std::endl;
+  std::cout << "MaskfileName:    " << MaskFileName << std::endl;
 
   // Grab the plt event reader
-  PLTEvent Event(DataFileName,IsText);
+  PLTEvent Event(DataFileName,MaskFileName,IsText);
   //Event.SetPlaneClustering(PLTPlane::kClustering_NoClustering);
   PLTPlane::FiducialRegion MyFiducialRegion = PLTPlane::kFiducialRegion_All;
   //  Event.SetPlaneClustering(PLTPlane::kClustering_AllTouching);
@@ -475,21 +476,22 @@ f->Write();
 
 int main (int argc, char* argv[])
 {
-  if (argc != 2) {
-    std::cerr << "Usage: " << argv[0] << " [DataFile.dat]" << std::endl;
+  if (argc != 3) {
+    std::cerr << "Usage: " << argv[0] << " [DataFile.dat]" << " [Maskfile.txt] (blank if none) " << std::endl;
     return 1;
   }
 
   std::string const DataFileName = argv[1];
+  std::string const MaskFileName = argv[2];
   //  OccupancyPlots(DataFileName);
 
   if(DataFileName.substr(DataFileName.find_last_of(".")+1) == "dat")
     {
-      OccupancyPlots(DataFileName,false);
+      OccupancyPlots(DataFileName,MaskFileName,false);
     }
   else if(DataFileName.substr(DataFileName.find_last_of(".")+1) == "txt")
     {
-      OccupancyPlots(DataFileName,true);
+      OccupancyPlots(DataFileName,MaskFileName,true);
     }
   else
     {

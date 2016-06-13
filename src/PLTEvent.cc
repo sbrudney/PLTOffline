@@ -16,16 +16,23 @@ PLTEvent::PLTEvent (std::string const DataFileName, bool const IsText)
   SetDefaults();
 }
 
-
-PLTEvent::PLTEvent (std::string const DataFileName, std::string const GainCalFileName, bool const IsText)
+PLTEvent::PLTEvent (std::string const DataFileName, std::string const MaskFileName,  bool const IsText)
 {
-  // Constructor, which will also give you access to the gaincal values
+  // Constructor, but you won't have the gaincal data..
   fBinFile.SetIsText(IsText);
-  fBinFile.Open(DataFileName);
-  fGainCal.ReadGainCalFile(GainCalFileName);
-  
+  fBinFile.Open(DataFileName,MaskFileName);
   SetDefaults();
 }
+
+// PLTEvent::PLTEvent (std::string const DataFileName, std::string const GainCalFileName, bool const IsText)
+// {
+//   // Constructor, which will also give you access to the gaincal values
+//   fBinFile.SetIsText(IsText);
+//   fBinFile.Open(DataFileName);
+//   fGainCal.ReadGainCalFile(GainCalFileName);
+  
+//   SetDefaults();
+// }
 
 
 PLTEvent::PLTEvent (std::string const DataFileName, std::string const GainCalFileName, std::string const AlignmentFileName, bool const IsText)
