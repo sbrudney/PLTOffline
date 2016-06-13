@@ -317,23 +317,27 @@ int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<P
       if (MaskFileName != "blank"){
 	std::pair<int,int> CHROC = std::make_pair(Channel, ROC);	
 	fMask.ReadMaskFile(MaskFileName);
-	//std::string Masktype = fMask.fMaskMap.begin()->first;
+	std::string MaskType = fMask.fMaskMap.begin()->first;
 	//// make above line into function
-	std::string MaskType = GetMaskType(MaskFileName);
+	//std::string MaskType = GetMaskType(MaskFileName);
 	//	std::cout<<"Mask Type: "<<MaskType<<std::endl;
 	//// fix notation below
-	if (fMask.fMaskMap[MaskType][CHROC].GColStart <= Col){// &&
-// 	    fMask[MaskType][CHROC].GColEnd >= Col &&
-// 	    fMask[MaskType][CHROC].GRowStart <= Row &&
-// 	    fMask[MaskType][CHROC].GRowEnd >= Row) {
+	if (fMask.fMaskMap[MaskType][CHROC].GColStart <= Col &&
+	    fMask.fMaskMap[MaskType][CHROC].GColEnd >= Col &&
+	    fMask.fMaskMap[MaskType][CHROC].GRowStart <= Row &&
+	    fMask.fMaskMap[MaskType][CHROC].GRowEnd >= Row) {
   
 	  // only keep hits on the diamond
 	  if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
 	    Hits.push_back(Hit);
-	    //	std::cout << "Hit: " << Channel << ":" << ROC << ":" << Col << ":" << Row << ":" << ADC << std::endl;
-	  } else {
+	    //std::cout << "Hit: " << Channel << ":" << ROC << ":" << Col << ":" << Row << ":" << ADC << std::endl;
+	  } 
+	  else {
 	    delete Hit;
 	  }
+	}
+	else{ 
+	  delete Hit;
 	}
       }
       else {
@@ -357,13 +361,16 @@ int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<P
   return Hits.size();
 }
 
-std::string GetMaskType(std::string const MaskFileName)
-{
+
+///!!!! Problems with declaring fMask in function below, would be good to work !!!!
+
+// std::string GetMaskType(std::string const MaskFileName)
+// {
   
-  fMask.ReadMaskFile(MaskFileName);
-  std::string MaskType = fMaskMap.begin->first();
-  return "blank";
-}
+//   fMask.ReadMaskFile(MaskFileName);
+//   std::string MaskType = fMask.fMaskMap.begin->first();
+//   return "blank";
+// }
 
 void PLTBinaryFileReader::ReadPixelMask (std::string const InFileName)
 {
