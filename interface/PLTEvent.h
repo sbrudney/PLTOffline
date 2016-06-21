@@ -15,10 +15,10 @@
 class PLTEvent : public PLTTracking
 {
   public:
+
     PLTEvent ();
     PLTEvent (std::string const, bool const IsText = false);
     PLTEvent (std::string const, std::string const, bool const IsText = false);
-    //   PLTEvent (std::string const, std::string const, bool const IsText = false);
     PLTEvent (std::string const, std::string const, std::string const, bool const IsText = false);
     //Adding a mask
     PLTEvent (std::string const, std::string const, std::string const, std::string const, bool const IsText = false);
@@ -58,7 +58,9 @@ class PLTEvent : public PLTTracking
       return fHits.size();
     }
 
-    int GetNextEvent (std::string const MaskFileName = "");
+    
+    int GetNextEvent (PLTMask Mask);
+    
 
     PLTGainCal* GetGainCal ()
     {
@@ -97,6 +99,7 @@ class PLTEvent : public PLTTracking
     {
       return fGainCal.GetHardwareID(ch);
     }
+
 
   private:
     unsigned long fRun;

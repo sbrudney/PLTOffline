@@ -7,6 +7,13 @@ PLTMask::PLTMask ()
   fIsGood = false;
 }
 
+PLTMask::PLTMask (std::string const MaskFileName)
+{
+  fIsGood = false;
+  ReadMaskFile(MaskFileName);
+
+}
+
 PLTMask::~PLTMask ()
 {
 }
@@ -40,7 +47,7 @@ void PLTMask::ReadMaskFile (std::string const InFileName)
 
     LineStream >> MaskType >> Channel  >> ROC;
 
-    std::cout<<"Mask type is: "<<MaskType<<std::endl;
+    //    std::cout<<"Mask type is: "<<MaskType<<std::endl;
 
     std::pair<int, int> CHROC = std::make_pair(Channel, ROC);
 
@@ -55,7 +62,7 @@ void PLTMask::ReadMaskFile (std::string const InFileName)
       PLTMask::MaskAlignmentStruct MAS = { ColStart, ColEnd, RowStart, RowEnd };
       // save values in map
       fMaskMap[MaskType][CHROC]= MAS;
-      std::cout<<MaskType<<" "<<Channel<<" "<<ROC<<" "<<ColStart<<std::endl;
+      // std::cout<<MaskType<<" "<<Channel<<" "<<ROC<<" "<<ColStart<<std::endl;
     }
     else {
       std::cerr << "WARNING: Mask file contains things I do not recognize: " << InLine << std::endl;

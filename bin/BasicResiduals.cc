@@ -9,17 +9,19 @@
 #include <iostream>
 
 #include "PLTEvent.h"
+#include "PLTMask.h"
 
 #include "TString.h"
 #include "TH1F.h"
 
 
-int BasicResiduals (std::string const DataFileName, std::string const GainCalFileName)
+int BasicResiduals (std::string const DataFileName, std::string const GainCalFileName, std::string const MaskFileName="MaskFiles/EqualMask.txt")
 {
   std::cout << "DataFileName:    " << DataFileName << std::endl;
   std::cout << "GainCalFileName: " << GainCalFileName << std::endl;
 
   // Grab the plt event reader
+  PLTMask Mask(MaskFileName);
   PLTEvent Event(DataFileName, GainCalFileName);
 
   // Maps for histograms
@@ -28,7 +30,8 @@ int BasicResiduals (std::string const DataFileName, std::string const GainCalFil
   std::map<int, TCanvas*> cMap;
 
   // Loop over all events in file
-  for (int ientry = 0; Event.GetNextEvent() >= 0; ++ientry) {
+
+  for (int ientry = 0; Event.GetNextEvent(Mask) >= 0; ++ientry) {
 
     // Loop over all planes with hits in event
     for (size_t it = 0; it != Event.NTelescopes(); ++it) {

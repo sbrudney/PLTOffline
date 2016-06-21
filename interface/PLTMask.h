@@ -17,6 +17,7 @@ class PLTMask
 {
  public:
   PLTMask ();
+  PLTMask (std::string const MaskFileName);
   ~PLTMask ();
 
   void ReadMaskFile (std::string const);

@@ -12,7 +12,7 @@
 #include "PLTHit.h"
 #include "PLTPlane.h"
 #include "PLTMask.h"
-//#include "PLTEvent.h"
+
 
 
 
@@ -20,23 +20,23 @@ class PLTBinaryFileReader
 {
   public:
     PLTBinaryFileReader ();
-    PLTBinaryFileReader (std::string const, bool const IsText = false, std::string const MaskFileName = "blank");
+    PLTBinaryFileReader (std::string const, bool const IsText = false);
     ~PLTBinaryFileReader ();
 
     //    bool Open (std::string const);
-    bool Open (std::string const, std::string const MaskFileName = "blank");
+    bool Open (std::string const);
     bool OpenBinary (std::string const);
     //    bool OpenTextFile (std::string const);
-    bool OpenTextFile (std::string const, std::string const MaskFileName = "blank");
+    bool OpenTextFile (std::string const);
     void SetIsText (bool const);
 
 
 
     int  convPXL (int);
     bool DecodeSpyDataFifo (uint32_t, std::vector<PLTHit*>&);
-    int  ReadEventHits (std::vector<PLTHit*>&, unsigned long&, uint32_t&, uint32_t&, std::string const);
+    int  ReadEventHits (std::vector<PLTHit*>&, unsigned long&, uint32_t&, uint32_t&, PLTMask Mask);
     int  ReadEventHits (std::ifstream&, std::vector<PLTHit*>&, unsigned long&, uint32_t&, uint32_t&);
-    int  ReadEventHitsText (std::ifstream&, std::vector<PLTHit*>&, unsigned long&, uint32_t&, uint32_t&, std::string const);
+    int  ReadEventHitsText (std::ifstream&, std::vector<PLTHit*>&, unsigned long&, uint32_t&, uint32_t&, PLTMask Mask);
 
     void ReadPixelMask (std::string const);
     bool IsPixelMasked (int const);
@@ -46,7 +46,9 @@ class PLTBinaryFileReader
     PLTPlane::FiducialRegion fPlaneFiducialRegion;
 
     //for mask
+    PLTMask Mask;
     PLTMask fMask;
+    PLTMask fMaskMap;
 
     static std::string GetMaskType(std::string const);
 

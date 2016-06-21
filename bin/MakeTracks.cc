@@ -45,7 +45,8 @@ int MakeTracks (std::string const DataFileName, std::string const GainCalFileNam
 //     Event.SetPlaneClustering(PLTPlane::kClustering_AllTouching, FidRegionHits);
 //   }
 //   else {
-  PLTEvent Event(DataFileName, GainCalFileName, AlignmentFileName, MaskFileName, IsText);
+  PLTMask Mask(MaskFileName);
+  PLTEvent Event(DataFileName, GainCalFileName, AlignmentFileName, IsText);
     
     
   PLTPlane::FiducialRegion FidRegionHits  = PLTPlane::kFiducialRegion_All;
@@ -77,7 +78,7 @@ int MakeTracks (std::string const DataFileName, std::string const GainCalFileNam
   std::map<int, TH1F*> MapResidualX;
 
   // Loop over all events in file
-  for (int ientry = 0; Event.GetNextEvent(MaskFileName) >= 0; ++ientry) {
+  for (int ientry = 0; Event.GetNextEvent(Mask) >= 0; ++ientry) {
     if (ientry % 10000 == 0) {
 //      std::cout << "Processing entry: " << ientry << std::endl;
     }

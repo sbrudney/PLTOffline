@@ -2,6 +2,7 @@
 
 
 
+
 PLTBinaryFileReader::PLTBinaryFileReader ()
 {
   fPlaneFiducialRegion = PLTPlane::kFiducialRegion_All;
@@ -10,12 +11,12 @@ PLTBinaryFileReader::PLTBinaryFileReader ()
 }
 
 
-PLTBinaryFileReader::PLTBinaryFileReader (std::string const in, bool IsText, std::string const MaskFileName)
+PLTBinaryFileReader::PLTBinaryFileReader (std::string const in, bool IsText)
 {
   SetIsText(IsText);
 
   if (fIsText) {
-    OpenTextFile(in, MaskFileName);
+    OpenTextFile(in);
   } else {
     Open(in);
   }
@@ -31,10 +32,10 @@ PLTBinaryFileReader::~PLTBinaryFileReader ()
 
 
 
-bool PLTBinaryFileReader::Open (std::string const DataFileName, std::string const MaskFileName)
+bool PLTBinaryFileReader::Open (std::string const DataFileName)
 {
   if (fIsText) {
-    return OpenTextFile(DataFileName, MaskFileName);
+    return OpenTextFile(DataFileName);
   } else {
     return OpenBinary(DataFileName);
   }
@@ -56,7 +57,7 @@ bool PLTBinaryFileReader::OpenBinary (std::string const DataFileName)
 
 
 
-bool PLTBinaryFileReader::OpenTextFile (std::string const DataFileName, std::string const MaskFileName)
+bool PLTBinaryFileReader::OpenTextFile (std::string const DataFileName)
 {
   fFileName = DataFileName;
   fInfile.open(fFileName.c_str());
@@ -151,10 +152,10 @@ bool PLTBinaryFileReader::DecodeSpyDataFifo (uint32_t word, std::vector<PLTHit*>
 }
 
 
-int PLTBinaryFileReader::ReadEventHits (std::vector<PLTHit*>& Hits, unsigned long& Event, uint32_t& Time, uint32_t& BX, std::string const MaskFileName)
+int PLTBinaryFileReader::ReadEventHits (std::vector<PLTHit*>& Hits, unsigned long& Event, uint32_t& Time, uint32_t& BX, PLTMask Mask)
 {
   if (fIsText) {
-    return ReadEventHitsText(fInfile, Hits, Event, Time, BX, MaskFileName);
+    return ReadEventHitsText(fInfile, Hits, Event, Time, BX, Mask);
   } else {
     return ReadEventHits(fInfile, Hits, Event, Time, BX);
   }
@@ -279,7 +280,7 @@ int PLTBinaryFileReader::ReadEventHits (std::ifstream& InFile, std::vector<PLTHi
 
 
 
-int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<PLTHit*>& Hits, unsigned long& Event, uint32_t& Time, uint32_t& BX, std::string const MaskFileName)
+int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<PLTHit*>& Hits, unsigned long& Event, uint32_t& Time, uint32_t& BX, PLTMask Mask)
 {
   int LastEventNumber = -1;
   int EventNumber = -1;
@@ -311,46 +312,48 @@ int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<P
       break;
     }
 
-    if ( !IsPixelMasked( Channel*100000 + ROC*10000 + Col*100 + Row ) ) {
+    if ( true){//!IsPixelMasked( Channel*100000 + ROC*10000 + Col*100 + Row ) ) {
       PLTHit* Hit = new PLTHit(Channel, ROC, Col, Row, ADC);
       //mask conditions can go here
-      if (MaskFileName != "blank"){
+      //if (MaskFileName != "blank"){
 	std::pair<int,int> CHROC = std::make_pair(Channel, ROC);	
-	fMask.ReadMaskFile(MaskFileName);
-	std::string MaskType = fMask.fMaskMap.begin()->first;
+	//fMask.ReadMaskFile(MaskFileName);
+	std::string MaskType = Mask.fMaskMap.begin()->first;
 	//// make above line into function
 	//std::string MaskType = GetMaskType(MaskFileName);
 	//	std::cout<<"Mask Type: "<<MaskType<<std::endl;
 	//// fix notation below
-	if (fMask.fMaskMap[MaskType][CHROC].GColStart <= Col &&
-	    fMask.fMaskMap[MaskType][CHROC].GColEnd >= Col &&
-	    fMask.fMaskMap[MaskType][CHROC].GRowStart <= Row &&
-	    fMask.fMaskMap[MaskType][CHROC].GRowEnd >= Row) {
-  
+	std::cout << "reading hit " << Channel << " | " << ROC << " | " << Col << " | " << Row << std::endl;
+	if (Mask.fMaskMap[MaskType][CHROC].GColStart <= Col &&
+	    Mask.fMaskMap[MaskType][CHROC].GColEnd >= Col &&
+	    Mask.fMaskMap[MaskType][CHROC].GRowStart <= Row &&
+	    Mask.fMaskMap[MaskType][CHROC].GRowEnd >= Row) {
+	  
 	  // only keep hits on the diamond
-	  if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
+	  //	  if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
 	    Hits.push_back(Hit);
+	    std::cout << "Pushed back hit" << std::endl;
 	    //std::cout << "Hit: " << Channel << ":" << ROC << ":" << Col << ":" << Row << ":" << ADC << std::endl;
-	  } 
-	  else {
-	    delete Hit;
-	  }
+	    //  } 
+	    // else {
+	    //delete Hit;
+	    // }
 	}
 	else{ 
 	  delete Hit;
 	}
       }
-      else {
-	// only keep hits on the diamond
-	if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
-	  Hits.push_back(Hit);
-	  //	std::cout << "Hit: " << Channel << ":" << ROC << ":" << Col << ":" << Row << ":" << ADC << std::endl;
-	} else {
-	  delete Hit;
-	}
-      }
+ //      else {
+// 	// only keep hits on the diamond
+// 	if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
+// 	  Hits.push_back(Hit);
+// 	  //	std::cout << "Hit: " << Channel << ":" << ROC << ":" << Col << ":" << Row << ":" << ADC << std::endl;
+// 	} else {
+// 	  delete Hit;
+// 	}
+//       }
       //printf("%2i %2i %2i %2i %5i %9i\n", Channel, ROC, Col, Row, ADC, EventNumber);
-    }
+    //}
     
     LastEventNumber = EventNumber;
     Event = EventNumber;
@@ -358,7 +361,7 @@ int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<P
   }
   
   
-  return Hits.size();
+return Hits.size();
 }
 
 
