@@ -17,7 +17,7 @@ class PLTEvent : public PLTTracking
   public:
 
     PLTEvent ();
-    PLTEvent (std::string const, bool const IsText = false);
+    PLTEvent (std::string const, bool const IsText = false, std::string const MaskFileName="");
     PLTEvent (std::string const, std::string const, bool const IsText = false);
     PLTEvent (std::string const, std::string const, std::string const, bool const IsText = false);
     //Adding a mask
@@ -59,7 +59,7 @@ class PLTEvent : public PLTTracking
     }
 
     
-    int GetNextEvent (PLTMask Mask);
+    int GetNextEvent ();
     
 
     PLTGainCal* GetGainCal ()

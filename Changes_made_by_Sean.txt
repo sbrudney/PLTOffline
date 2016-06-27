@@ -1,0 +1,6 @@
+Changes made:
+
+added PLTMask.cc & .h to be used to read a mask txt file
+added MaskFileMaker.py to quickly make mask files
+changed MakeTracks.cc & OccupancyPlots.cc to accept a mask file
+changed PLTEvent.cc/h & PLTBinaryFileReader.cc/h to be able to implement mask file when data file is a text file

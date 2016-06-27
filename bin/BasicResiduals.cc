@@ -31,7 +31,7 @@ int BasicResiduals (std::string const DataFileName, std::string const GainCalFil
 
   // Loop over all events in file
 
-  for (int ientry = 0; Event.GetNextEvent(Mask) >= 0; ++ientry) {
+  for (int ientry = 0; Event.GetNextEvent() >= 0; ++ientry) {
 
     // Loop over all planes with hits in event
     for (size_t it = 0; it != Event.NTelescopes(); ++it) {

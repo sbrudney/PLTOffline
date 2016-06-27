@@ -8,12 +8,13 @@ PLTEvent::PLTEvent ()
 }
 
 
-PLTEvent::PLTEvent (std::string const DataFileName, bool const IsText)
+PLTEvent::PLTEvent (std::string const DataFileName, bool const IsText, std::string const MaskFileName)
 {
   // Constructor, but you won't have the gaincal data..
   fBinFile.SetIsText(IsText);
-  fBinFile.Open(DataFileName);
+  fBinFile.Open(DataFileName,MaskFileName);
   SetDefaults();
+  //fMask.ReadMaskFile(MaskFileName);
 }
 
 PLTEvent::PLTEvent (std::string const DataFileName, std::string const GainCalFileName, bool const IsText)
@@ -42,22 +43,22 @@ PLTEvent::PLTEvent (std::string const DataFileName, std::string const GainCalFil
 }
 
 
-// PLTEvent::PLTEvent (std::string const DataFileName, std::string const GainCalFileName, std::string const AlignmentFileName, bool const IsText) 
-// {
-//   // Constructor, which will also give you access to the gaincal values
-//   fBinFile.SetIsText(IsText);
-//   fBinFile.Open(DataFileName);
-//   fGainCal.ReadGainCalFile(GainCalFileName);
-//   fAlignment.ReadAlignmentFile(AlignmentFileName);
-// //   if (MaskFileName != "blank"){
-// //     fMask.ReadMaskFile(MaskFileName);
-// //   }
+PLTEvent::PLTEvent (std::string const DataFileName, std::string const GainCalFileName, std::string const AlignmentFileName,std::string const MaskFileName,  bool const IsText) 
+{
+  // Constructor, which will also give you access to the gaincal values
+  fBinFile.SetIsText(IsText);
+  fBinFile.Open(DataFileName, MaskFileName);
+  fGainCal.ReadGainCalFile(GainCalFileName);
+  fAlignment.ReadAlignmentFile(AlignmentFileName);
+//   if (MaskFileName != "blank"){
+//     fMask.ReadMaskFile(MaskFileName);
+//   }
 
-//   SetDefaults();
+  SetDefaults();
 
-//   SetTrackingAlignment(&fAlignment);
-//   SetTrackingAlgorithm(PLTTracking::kTrackingAlgorithm_01to2_All);
-// }
+  SetTrackingAlignment(&fAlignment);
+  SetTrackingAlgorithm(PLTTracking::kTrackingAlgorithm_01to2_All);
+}
 
 PLTEvent::~PLTEvent ()
 {
@@ -271,13 +272,13 @@ void PLTEvent::SetPlaneClustering (PLTPlane::Clustering in, PLTPlane::FiducialRe
 
 
 
-int PLTEvent::GetNextEvent (PLTMask Mask)
+int PLTEvent::GetNextEvent ()
 {
   // First clear the event
   Clear();
 
   // The number we'll return.. number of hits, or -1 for end
-  int ret = fBinFile.ReadEventHits(fHits, fEvent, fTime, fBX, Mask);
+  int ret = fBinFile.ReadEventHits(fHits, fEvent, fTime, fBX);
   if (ret < 0) {
     return ret;
   }

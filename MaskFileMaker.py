@@ -156,7 +156,7 @@ def makeInvertedConeFile(Channels, ROCs, ColStart, ColEnd, RowStart, RowEnd, dif
     f.close()
     return
 
-def makeManyMaskFiles(MaskTypes=['Equal','Hourglass','Cone','InvertedCone'], Channels=30, ROCs=3, ColStart=20, ColEnd=40, RowStart=20, RowEnd=40, difference=1.0):
+def makeManyMaskFiles(MaskTypes=['Equal','Hourglass','Cone','InvertedCone'], Channels=100, ROCs=3, ColStart=10, ColEnd=46, RowStart=8, RowEnd=71, difference=1.0):
     """
     loops through MaskTypes to make several mask files to be used by MakeTracks
 

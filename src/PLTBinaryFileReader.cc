@@ -32,8 +32,11 @@ PLTBinaryFileReader::~PLTBinaryFileReader ()
 
 
 
-bool PLTBinaryFileReader::Open (std::string const DataFileName)
+bool PLTBinaryFileReader::Open (std::string const DataFileName,std::string const MaskFileName)
 {
+  if (MaskFileName != ""){
+    fMask.ReadMaskFile(MaskFileName);
+  }
   if (fIsText) {
     return OpenTextFile(DataFileName);
   } else {
@@ -152,10 +155,10 @@ bool PLTBinaryFileReader::DecodeSpyDataFifo (uint32_t word, std::vector<PLTHit*>
 }
 
 
-int PLTBinaryFileReader::ReadEventHits (std::vector<PLTHit*>& Hits, unsigned long& Event, uint32_t& Time, uint32_t& BX, PLTMask Mask)
+int PLTBinaryFileReader::ReadEventHits (std::vector<PLTHit*>& Hits, unsigned long& Event, uint32_t& Time, uint32_t& BX)
 {
   if (fIsText) {
-    return ReadEventHitsText(fInfile, Hits, Event, Time, BX, Mask);
+    return ReadEventHitsText(fInfile, Hits, Event, Time, BX);
   } else {
     return ReadEventHits(fInfile, Hits, Event, Time, BX);
   }
@@ -280,7 +283,7 @@ int PLTBinaryFileReader::ReadEventHits (std::ifstream& InFile, std::vector<PLTHi
 
 
 
-int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<PLTHit*>& Hits, unsigned long& Event, uint32_t& Time, uint32_t& BX, PLTMask Mask)
+int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<PLTHit*>& Hits, unsigned long& Event, uint32_t& Time, uint32_t& BX)
 {
   int LastEventNumber = -1;
   int EventNumber = -1;
@@ -318,17 +321,16 @@ int PLTBinaryFileReader::ReadEventHitsText (std::ifstream& InFile, std::vector<P
       //if (MaskFileName != "blank"){
 	std::pair<int,int> CHROC = std::make_pair(Channel, ROC);	
 	//fMask.ReadMaskFile(MaskFileName);
-	std::string MaskType = Mask.fMaskMap.begin()->first;
+	std::string MaskType = fMask.fMaskMap.begin()->first;
 	//// make above line into function
 	//std::string MaskType = GetMaskType(MaskFileName);
 	//	std::cout<<"Mask Type: "<<MaskType<<std::endl;
 	//// fix notation below
 	std::cout << "reading hit " << Channel << " | " << ROC << " | " << Col << " | " << Row << std::endl;
-	if (Mask.fMaskMap[MaskType][CHROC].GColStart <= Col &&
-	    Mask.fMaskMap[MaskType][CHROC].GColEnd >= Col &&
-	    Mask.fMaskMap[MaskType][CHROC].GRowStart <= Row &&
-	    Mask.fMaskMap[MaskType][CHROC].GRowEnd >= Row) {
-	  
+	if (fMask.fMaskMap[MaskType][CHROC].GColStart <= Col &&
+	    fMask.fMaskMap[MaskType][CHROC].GColEnd >= Col &&
+	    fMask.fMaskMap[MaskType][CHROC].GRowStart <= Row &&
+	    fMask.fMaskMap[MaskType][CHROC].GRowEnd >= Row) {
 	  // only keep hits on the diamond
 	  //	  if (PLTPlane::IsFiducial(fPlaneFiducialRegion, Hit)) {
 	    Hits.push_back(Hit);

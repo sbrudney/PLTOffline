@@ -84,8 +84,8 @@ int OccupancyPlots (std::string const DataFileName,std::string const MaskFileNam
   std::cout << "MaskfileName:    " << MaskFileName << std::endl;
 
   // Grab the plt event reader
-  PLTMask Mask(MaskFileName);
-  PLTEvent Event(DataFileName,IsText);
+  //PLTMask Mask(MaskFileName);
+  PLTEvent Event(DataFileName,IsText,MaskFileName);
   
   //std::cout<<fMask.fMaskMap.begin()->first<<std::endl;
   //Event.SetPlaneClustering(PLTPlane::kClustering_NoClustering);
@@ -118,7 +118,7 @@ int OccupancyPlots (std::string const DataFileName,std::string const MaskFileNam
   // char buffer for writing names
   char BUFF[200];
   // Loop over all events in file
-  for (int ientry = 0; Event.GetNextEvent(MaskFileName) >= 0; ++ientry) {
+  for (int ientry = 0; Event.GetNextEvent() >= 0; ++ientry) {
     if (ientry % 500000 == 0) {
       int nsec = Event.Time()/1000;
       int hr = nsec/3600;
